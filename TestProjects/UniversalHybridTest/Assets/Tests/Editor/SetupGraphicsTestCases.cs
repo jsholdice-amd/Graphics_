@@ -105,6 +105,7 @@ public class SetupGraphicsTestCases : IPrebuildSetup
                 c.SaveAsset();
             }
             AssetDatabase.Refresh();
+            Log("*************** SetupGraphicsTestCases - Synced "+buildSettingScenes.Length+ " scenes to scenelist on "+assets.Length+" Assets/Tests/Editor/ BuildConfig assets.");
         }
         else
         {
@@ -112,9 +113,8 @@ public class SetupGraphicsTestCases : IPrebuildSetup
             var sceneListComponent = config.GetComponent<SceneList>();
             sceneListComponent.SceneInfos = scenelist;
             config.SetComponent<SceneList>(sceneListComponent);
-        }
-
-        Log("*************** SetupGraphicsTestCases - Synced "+buildSettingScenes.Length+ " scenes to scenelist on "+assets.Length+" Assets/Tests/Editor/ BuildConfig assets.");
+            Log("*************** SetupGraphicsTestCases - Synced "+buildSettingScenes.Length+ " scenes to scenelist");
+        }       
     }
 
     [MenuItem("GraphicsTest/Debug/CreateFolder")]
