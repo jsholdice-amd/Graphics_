@@ -50,6 +50,9 @@ public class SetupGraphicsTestCases : IPrebuildSetup
         target = EditorUserBuildSettings.activeBuildTarget;
         config = FindConfig(target);
 
+        //Sync scenelist
+        SyncSceneList(false);
+
         Log("*************** SetupGraphicsTestCases - Triggering BuildConfig.Build()");
 
         //Make the build
@@ -80,7 +83,7 @@ public class SetupGraphicsTestCases : IPrebuildSetup
     //Sync scenelist from BuildSettings to BuildConfig
     //Cannot automate this because Yamato complains "InvalidOperationException: Building is not allowed while Unity is compiling."
     [MenuItem("GraphicsTest/SyncSceneListToAllConfig")]
-    private static void SyncSceneList()
+    private static void SyncSceneList(bool applyToAll = true)
     {      
         EditorBuildSettingsScene[] buildSettingScenes = EditorBuildSettings.scenes;
         List<SceneList.SceneInfo> scenelist = new List<SceneList.SceneInfo>();
@@ -90,17 +93,26 @@ public class SetupGraphicsTestCases : IPrebuildSetup
             scenelist.Add(new SceneList.SceneInfo() { AutoLoad = false, Scene = GlobalObjectId.GetGlobalObjectIdSlow(sceneAsset) });
         }
 
-        var assets = AssetDatabase.FindAssets("t:BuildConfiguration", new[] {"Assets/Tests/Editor"});
-        foreach (var guid in assets) 
+        if(applyToAll)
         {
-            var c = AssetDatabase.LoadAssetAtPath<BuildConfiguration>(AssetDatabase.GUIDToAssetPath(guid));
-            var sceneListComponent = c.GetComponent<SceneList>();
-            sceneListComponent.SceneInfos = scenelist;
-            c.SetComponent<SceneList>(sceneListComponent);
-            c.SaveAsset();
+            var assets = AssetDatabase.FindAssets("t:BuildConfiguration", new[] {"Assets/Tests/Editor"});
+            foreach (var guid in assets) 
+            {
+                var c = AssetDatabase.LoadAssetAtPath<BuildConfiguration>(AssetDatabase.GUIDToAssetPath(guid));
+                var sceneListComponent = c.GetComponent<SceneList>();
+                sceneListComponent.SceneInfos = scenelist;
+                c.SetComponent<SceneList>(sceneListComponent);
+                c.SaveAsset();
+            }
+            AssetDatabase.Refresh();
         }
-
-        AssetDatabase.Refresh();
+        else
+        {
+            //Yamato will run this
+            var sceneListComponent = config.GetComponent<SceneList>();
+            sceneListComponent.SceneInfos = scenelist;
+            config.SetComponent<SceneList>(sceneListComponent);
+        }
 
         Log("*************** SetupGraphicsTestCases - Synced "+buildSettingScenes.Length+ " scenes to scenelist on "+assets.Length+" Assets/Tests/Editor/ BuildConfig assets.");
     }
