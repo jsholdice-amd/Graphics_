@@ -1,21 +1,51 @@
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
+// INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD ONLY PREVIEW - INTERNAL AMD 
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
 //
-//                                              [A] SHADER PORTABILITY 1.20190528
+//                                              [A] SHADER PORTABILITY 1.20200217
 //
 //==============================================================================================================================
-// LICENSE
-// =======
-// Copyright (c) 2017-2019 Advanced Micro Devices, Inc. All rights reserved.
-// -------
+// MIT LICENSE
+// ===========
+// Copyright (c) 2017-2020 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2014 Michal Drobot (for concepts used in "FLOAT APPROXIMATIONS").
+// -----------
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
 // modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// -------
+// -----------
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
 // Software.
-// -------
+// -----------
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
@@ -23,8 +53,7 @@
 //------------------------------------------------------------------------------------------------------------------------------
 // ABOUT
 // =====
-// For questions and comments, feel free to contact the author directly: timothy.lottes@amd.com
-// Common central point for high-level shading language portability for various shader headers.
+// Common central point for high-level shading language and C portability for various shader headers.
 //------------------------------------------------------------------------------------------------------------------------------
 // DEFINES
 // =======
@@ -41,7 +70,7 @@
 // =======
 // A_WAVE .... Support wave-wide operations.
 //------------------------------------------------------------------------------------------------------------------------------
-// To get #include "a.h" working in GLSL use '#extension GL_GOOGLE_include_directive:require'.
+// To get #include "ffx_a.ush" working in GLSL use '#extension GL_GOOGLE_include_directive:require'.
 //------------------------------------------------------------------------------------------------------------------------------
 // SIMPLIFIED TYPE SYSTEM
 // ======================
@@ -60,10 +89,17 @@
 // TODO
 // ====
 //  - Make sure 'ALerp*(a,b,m)' does 'b*m+(-a*m+a)' (2 ops).
-//  - Add subgroup ops.
 //------------------------------------------------------------------------------------------------------------------------------
 // CHANGE LOG
 // ==========
+// 20200217 - Attempting workaround for HLSL compiler bug and multi-component wave ops.
+// 20200210 - Merged backed with existing public header.
+// 20200204 - Fix AMax*1() CPU portability functions to max, they had typo of min prior.
+// 20200203 - Added opAAddOne*() for LPM.
+// 20190827 - Various, fixed ASigned*(), must do diff to merge back.
+// 20190716 - Code cleaning.
+// 20190531 - Fixed changed to llabs() because long is int on Windows.
+// 20190530 - Updated for new CPU/GPU portability.
 // 20190528 - Fix AU1_AH2_x() on HLSL (had incorrectly swapped x and y), fixed asuint() cases.
 // 20190527 - Added min3/max3 for low precision for HLSL.
 // 20190526 - Updated with half approximations, added ARsq*(), and ASat*() for CPU.
@@ -90,20 +126,36 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
 //
+//
 //                                                             CPU
 //
+//
 //==============================================================================================================================
-// Requires standard C types: stdint.h
+// Requires standard C types: stdint.ush
+// Requires a collection of standard math intrinsics.
+//  - Requires VS2013 when not using GCC to get exp2() and log2().
+//  - https://blogs.msdn.microsoft.com/vcblog/2013/07/19/c99-library-support-in-visual-studio-2013/
+//------------------------------------------------------------------------------------------------------------------------------
+// This provides a minimum subset of functionality compared to the GPU parts.
 //==============================================================================================================================
 #ifdef A_CPU
+ // Supporting user defined overrides.
  #ifndef A_RESTRICT
   #define A_RESTRICT __restrict
  #endif
 //------------------------------------------------------------------------------------------------------------------------------
+ #ifndef A_STATIC
+  #define A_STATIC static
+ #endif
+//------------------------------------------------------------------------------------------------------------------------------
  // Same types across CPU and GPU.
+ // Predicate uses 32-bit integer (C friendly bool).
+ typedef uint32_t AP1;
  typedef float AF1;
  typedef double AD1;
  typedef uint8_t AB1;
@@ -115,56 +167,347 @@
  typedef int32_t ASU1;
  typedef int64_t ASL1;
 //------------------------------------------------------------------------------------------------------------------------------
- // Predicate uses 32-bit integer (C friendly bool).
- typedef uint32_t AP1;
+ #define AD1_(a) ((AD1)(a))
+ #define AF1_(a) ((AF1)(a))
+ #define AL1_(a) ((AL1)(a))
+ #define AU1_(a) ((AU1)(a))
 //------------------------------------------------------------------------------------------------------------------------------
- static AU1 AU1_AF1(AF1 x){union{AF1 f;AU1 u;}bits;bits.f=x;return bits.u;}
+ #define ASL1_(a) ((ASL1)(a))
+ #define ASU1_(a) ((ASU1)(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AU1 AU1_AF1(AF1 a){union{AF1 f;AU1 u;}bits;bits.f=a;return bits.u;}
+ A_STATIC AF1 AF1_AU1(AU1 a){union{AF1 f;AU1 u;}bits;bits.u=a;return bits.f;} // Volkan: adding f->u conversion to use CpfJit() code on CPU
+//------------------------------------------------------------------------------------------------------------------------------
+ #define A_TRUE 1
+ #define A_FALSE 0
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
-//                                                            MATHS
+//
+//                                                       CPU/GPU PORTING
+//
 //------------------------------------------------------------------------------------------------------------------------------
-// Has some dependency on external built-in function support.
+// Hackary to get CPU and GPU to share all setup code, without duplicate code paths.
+// Unfortunately this is the level of "ugly" that is required since the languages are very different.
+// This uses a lower-case prefix for special vector constructs.
+//  - In C restrict pointers are used.
+//  - In the shading language, in/inout/out arguments are used.
+// This depends on the ability to access a vector value in both languages via array syntax (aka color[2]).
+//==============================================================================================================================
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                     VECTOR ARGUMENT/RETURN/INITIALIZATION PORTABILITY
+//==============================================================================================================================
+ #define retAD2 AD1 *A_RESTRICT
+ #define retAD3 AD1 *A_RESTRICT
+ #define retAD4 AD1 *A_RESTRICT
+ #define retAF2 AF1 *A_RESTRICT
+ #define retAF3 AF1 *A_RESTRICT
+ #define retAF4 AF1 *A_RESTRICT
+ #define retAL2 AL1 *A_RESTRICT
+ #define retAL3 AL1 *A_RESTRICT
+ #define retAL4 AL1 *A_RESTRICT
+ #define retAU2 AU1 *A_RESTRICT
+ #define retAU3 AU1 *A_RESTRICT
+ #define retAU4 AU1 *A_RESTRICT
+//------------------------------------------------------------------------------------------------------------------------------
+ #define inAD2 AD1 *A_RESTRICT
+ #define inAD3 AD1 *A_RESTRICT
+ #define inAD4 AD1 *A_RESTRICT
+ #define inAF2 AF1 *A_RESTRICT
+ #define inAF3 AF1 *A_RESTRICT
+ #define inAF4 AF1 *A_RESTRICT
+ #define inAL2 AL1 *A_RESTRICT
+ #define inAL3 AL1 *A_RESTRICT
+ #define inAL4 AL1 *A_RESTRICT
+ #define inAU2 AU1 *A_RESTRICT
+ #define inAU3 AU1 *A_RESTRICT
+ #define inAU4 AU1 *A_RESTRICT
+//------------------------------------------------------------------------------------------------------------------------------
+ #define inoutAD2 AD1 *A_RESTRICT
+ #define inoutAD3 AD1 *A_RESTRICT
+ #define inoutAD4 AD1 *A_RESTRICT
+ #define inoutAF2 AF1 *A_RESTRICT
+ #define inoutAF3 AF1 *A_RESTRICT
+ #define inoutAF4 AF1 *A_RESTRICT
+ #define inoutAL2 AL1 *A_RESTRICT
+ #define inoutAL3 AL1 *A_RESTRICT
+ #define inoutAL4 AL1 *A_RESTRICT
+ #define inoutAU2 AU1 *A_RESTRICT
+ #define inoutAU3 AU1 *A_RESTRICT
+ #define inoutAU4 AU1 *A_RESTRICT
+//------------------------------------------------------------------------------------------------------------------------------
+ #define outAD2 AD1 *A_RESTRICT
+ #define outAD3 AD1 *A_RESTRICT
+ #define outAD4 AD1 *A_RESTRICT
+ #define outAF2 AF1 *A_RESTRICT
+ #define outAF3 AF1 *A_RESTRICT
+ #define outAF4 AF1 *A_RESTRICT
+ #define outAL2 AL1 *A_RESTRICT
+ #define outAL3 AL1 *A_RESTRICT
+ #define outAL4 AL1 *A_RESTRICT
+ #define outAU2 AU1 *A_RESTRICT
+ #define outAU3 AU1 *A_RESTRICT
+ #define outAU4 AU1 *A_RESTRICT
+//------------------------------------------------------------------------------------------------------------------------------
+ #define varAD2(x) AD1 x[2]
+ #define varAD3(x) AD1 x[3]
+ #define varAD4(x) AD1 x[4]
+ #define varAF2(x) AF1 x[2]
+ #define varAF3(x) AF1 x[3]
+ #define varAF4(x) AF1 x[4]
+ #define varAL2(x) AL1 x[2]
+ #define varAL3(x) AL1 x[3]
+ #define varAL4(x) AL1 x[4]
+ #define varAU2(x) AU1 x[2]
+ #define varAU3(x) AU1 x[3]
+ #define varAU4(x) AU1 x[4]
+//------------------------------------------------------------------------------------------------------------------------------
+ #define initAD2(x,y) {x,y}
+ #define initAD3(x,y,z) {x,y,z}
+ #define initAD4(x,y,z,w) {x,y,z,w}
+ #define initAF2(x,y) {x,y}
+ #define initAF3(x,y,z) {x,y,z}
+ #define initAF4(x,y,z,w) {x,y,z,w}
+ #define initAL2(x,y) {x,y}
+ #define initAL3(x,y,z) {x,y,z}
+ #define initAL4(x,y,z,w) {x,y,z,w}
+ #define initAU2(x,y) {x,y}
+ #define initAU3(x,y,z) {x,y,z}
+ #define initAU4(x,y,z,w) {x,y,z,w}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                     SCALAR RETURN OPS
+//------------------------------------------------------------------------------------------------------------------------------
+// TODO
+// ====
+//  - Replace transcendentals with manual versions. 
 //==============================================================================================================================
  #ifdef A_GCC
-  static AF1 AFloorF1(AF1 x){return __builtin_floorf(x);}
+  A_STATIC AD1 AAbsD1(AD1 a){return __builtin_fabs(a);}
+  A_STATIC AF1 AAbsF1(AF1 a){return __builtin_fabsf(a);}
+  A_STATIC AU1 AAbsSU1(AU1 a){return AU1_(__builtin_abs(ASU1_(a)));}
+  A_STATIC AL1 AAbsSL1(AL1 a){return AL1_(__builtin_llabs(ASL1_(a)));}
  #else
-  static AF1 AFloorF1(AF1 x){return floorf(x);}
+  A_STATIC AD1 AAbsD1(AD1 a){return fabs(a);}
+  A_STATIC AF1 AAbsF1(AF1 a){return fabsf(a);}
+  A_STATIC AU1 AAbsSU1(AU1 a){return AU1_(abs(ASU1_(a)));}
+  A_STATIC AL1 AAbsSL1(AL1 a){return AL1_(labs(ASL1_(a)));}
  #endif
 //------------------------------------------------------------------------------------------------------------------------------
- static AF1 AFractF1(AF1 x){return x-AFloorF1(x);}
+ #ifdef A_GCC
+  A_STATIC AD1 ACosD1(AD1 a){return __builtin_cos(a);}
+  A_STATIC AF1 ACosF1(AF1 a){return __builtin_cosf(a);}
+ #else
+  A_STATIC AD1 ACosD1(AD1 a){return cos(a);}
+  A_STATIC AF1 ACosF1(AF1 a){return cosf(a);}
+ #endif
 //------------------------------------------------------------------------------------------------------------------------------
- static AF1 AMaxF1(AF1 a,AF1 b){return a>b?a:b;}
- static AD1 AMaxD1(AD1 a,AD1 b){return a>b?a:b;}
- static AB1 AMaxB1(AB1 a,AB1 b){return a>b?a:b;}
- static AW1 AMaxW1(AW1 a,AW1 b){return a>b?a:b;}
- static AU1 AMaxU1(AU1 a,AU1 b){return a>b?a:b;}
- static AL1 AMaxL1(AL1 a,AL1 b){return a>b?a:b;}
- // These follow the convention that A integer types don't have sign, until they are operated on. 
- static AB1 AMaxSB1(AB1 a,AB1 b){return ((ASB1)a)>((ASB1)b)?a:b;}
- static AW1 AMaxSW1(AW1 a,AW1 b){return ((ASW1)a)>((ASW1)b)?a:b;}
- static AU1 AMaxSU1(AU1 a,AU1 b){return ((ASU1)a)>((ASU1)b)?a:b;}
- static AL1 AMaxSL1(AL1 a,AL1 b){return ((ASL1)a)>((ASL1)b)?a:b;}
+ A_STATIC AD1 ADotD2(inAD2 a,inAD2 b){return a[0]*b[0]+a[1]*b[1];}
+ A_STATIC AD1 ADotD3(inAD3 a,inAD3 b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+ A_STATIC AD1 ADotD4(inAD4 a,inAD4 b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3];}
+ A_STATIC AF1 ADotF2(inAF2 a,inAF2 b){return a[0]*b[0]+a[1]*b[1];}
+ A_STATIC AF1 ADotF3(inAF3 a,inAF3 b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+ A_STATIC AF1 ADotF4(inAF4 a,inAF4 b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3];}
 //------------------------------------------------------------------------------------------------------------------------------
- static AF1 AMinF1(AF1 a,AF1 b){return a<b?a:b;}
- static AD1 AMinD1(AD1 a,AD1 b){return a<b?a:b;}
- static AB1 AMinB1(AB1 a,AB1 b){return a<b?a:b;}
- static AW1 AMinW1(AW1 a,AW1 b){return a<b?a:b;}
- static AU1 AMinU1(AU1 a,AU1 b){return a<b?a:b;}
- static AL1 AMinL1(AL1 a,AL1 b){return a<b?a:b;}
- static AB1 AMinSB1(AB1 a,AB1 b){return ((ASB1)a)<((ASB1)b)?a:b;}
- static AW1 AMinSW1(AW1 a,AW1 b){return ((ASW1)a)<((ASW1)b)?a:b;}
- static AU1 AMinSU1(AU1 a,AU1 b){return ((ASU1)a)<((ASU1)b)?a:b;}
- static AL1 AMinSL1(AL1 a,AL1 b){return ((ASL1)a)<((ASL1)b)?a:b;}
+ #ifdef A_GCC
+  A_STATIC AD1 AExp2D1(AD1 a){return __builtin_exp2(a);}
+  A_STATIC AF1 AExp2F1(AF1 a){return __builtin_exp2f(a);}
+ #else
+  A_STATIC AD1 AExp2D1(AD1 a){return exp2(a);}
+  A_STATIC AF1 AExp2F1(AF1 a){return exp2f(a);}
+ #endif
 //------------------------------------------------------------------------------------------------------------------------------
- static AF1 ASatF1(AF1 a){return AMinF1(1.0f,AMaxF1(0.0f,a));}
- static AD1 ASatD1(AD1 a){return AMinD1(1.0,AMaxD1(0.0,a));}
+ #ifdef A_GCC
+  A_STATIC AD1 AFloorD1(AD1 a){return __builtin_floor(a);}
+  A_STATIC AF1 AFloorF1(AF1 a){return __builtin_floorf(a);}
+ #else
+  A_STATIC AD1 AFloorD1(AD1 a){return floor(a);}
+  A_STATIC AF1 AFloorF1(AF1 a){return floorf(a);}
+ #endif
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 ALerpD1(AD1 a,AD1 b,AD1 c){return b*c+(-a*c+a);}
+ A_STATIC AF1 ALerpF1(AF1 a,AF1 b,AF1 c){return b*c+(-a*c+a);}
+//------------------------------------------------------------------------------------------------------------------------------
+ #ifdef A_GCC
+  A_STATIC AD1 ALog2D1(AD1 a){return __builtin_log2(a);}
+  A_STATIC AF1 ALog2F1(AF1 a){return __builtin_log2f(a);}
+ #else
+  A_STATIC AD1 ALog2D1(AD1 a){return log2(a);}
+  A_STATIC AF1 ALog2F1(AF1 a){return log2f(a);}
+ #endif
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 AMaxD1(AD1 a,AD1 b){return a>b?a:b;}
+ A_STATIC AF1 AMaxF1(AF1 a,AF1 b){return a>b?a:b;}
+ A_STATIC AL1 AMaxL1(AL1 a,AL1 b){return a>b?a:b;}
+ A_STATIC AU1 AMaxU1(AU1 a,AU1 b){return a>b?a:b;}
+//------------------------------------------------------------------------------------------------------------------------------
+ // These follow the convention that A integer types don't have signage, until they are operated on. 
+ A_STATIC AL1 AMaxSL1(AL1 a,AL1 b){return (ASL1_(a)>ASL1_(b))?a:b;}
+ A_STATIC AU1 AMaxSU1(AU1 a,AU1 b){return (ASU1_(a)>ASU1_(b))?a:b;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 AMinD1(AD1 a,AD1 b){return a<b?a:b;}
+ A_STATIC AF1 AMinF1(AF1 a,AF1 b){return a<b?a:b;}
+ A_STATIC AL1 AMinL1(AL1 a,AL1 b){return a<b?a:b;}
+ A_STATIC AU1 AMinU1(AU1 a,AU1 b){return a<b?a:b;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AL1 AMinSL1(AL1 a,AL1 b){return (ASL1_(a)<ASL1_(b))?a:b;}
+ A_STATIC AU1 AMinSU1(AU1 a,AU1 b){return (ASU1_(a)<ASU1_(b))?a:b;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 ARcpD1(AD1 a){return 1.0/a;}
+ A_STATIC AF1 ARcpF1(AF1 a){return 1.0f/a;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AL1 AShrSL1(AL1 a,AL1 b){return AL1_(ASL1_(a)>>ASL1_(b));}
+ A_STATIC AU1 AShrSU1(AU1 a,AU1 b){return AU1_(ASU1_(a)>>ASU1_(b));}
+//------------------------------------------------------------------------------------------------------------------------------
+ #ifdef A_GCC
+  A_STATIC AD1 ASinD1(AD1 a){return __builtin_sin(a);}
+  A_STATIC AF1 ASinF1(AF1 a){return __builtin_sinf(a);}
+ #else
+  A_STATIC AD1 ASinD1(AD1 a){return sin(a);}
+  A_STATIC AF1 ASinF1(AF1 a){return sinf(a);}
+ #endif
+//------------------------------------------------------------------------------------------------------------------------------
+ #ifdef A_GCC
+  A_STATIC AD1 ASqrtD1(AD1 a){return __builtin_sqrt(a);}
+  A_STATIC AF1 ASqrtF1(AF1 a){return __builtin_sqrtf(a);}
+ #else
+  A_STATIC AD1 ASqrtD1(AD1 a){return sqrt(a);}
+  A_STATIC AF1 ASqrtF1(AF1 a){return sqrtf(a);}
+ #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
-//                                                         HALF FLOAT
+//                                               SCALAR RETURN OPS - DEPENDENT
+//==============================================================================================================================
+ A_STATIC AD1 AFractD1(AD1 a){return a-AFloorD1(a);}
+ A_STATIC AF1 AFractF1(AF1 a){return a-AFloorF1(a);}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 APowD1(AD1 a,AD1 b){return AExp2D1(b*ALog2D1(a));}
+ A_STATIC AF1 APowF1(AF1 a,AF1 b){return AExp2F1(b*ALog2F1(a));}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 ARsqD1(AD1 a){return ARcpD1(ASqrtD1(a));}
+ A_STATIC AF1 ARsqF1(AF1 a){return ARcpF1(ASqrtF1(a));}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC AD1 ASatD1(AD1 a){return AMinD1(1.0,AMaxD1(0.0,a));}
+ A_STATIC AF1 ASatF1(AF1 a){return AMinF1(1.0f,AMaxF1(0.0f,a));}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                         VECTOR OPS
+//------------------------------------------------------------------------------------------------------------------------------
+// These are added as needed for production or prototyping, so not necessarily a complete set.
+// They follow a convention of taking in a destination and also returning the destination value to increase utility.
+//==============================================================================================================================
+ A_STATIC retAD2 opAAbsD2(outAD2 d,inAD2 a){d[0]=AAbsD1(a[0]);d[1]=AAbsD1(a[1]);return d;}
+ A_STATIC retAD3 opAAbsD3(outAD3 d,inAD3 a){d[0]=AAbsD1(a[0]);d[1]=AAbsD1(a[1]);d[2]=AAbsD1(a[2]);return d;}
+ A_STATIC retAD4 opAAbsD4(outAD4 d,inAD4 a){d[0]=AAbsD1(a[0]);d[1]=AAbsD1(a[1]);d[2]=AAbsD1(a[2]);d[3]=AAbsD1(a[3]);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAAbsF2(outAF2 d,inAF2 a){d[0]=AAbsF1(a[0]);d[1]=AAbsF1(a[1]);return d;}
+ A_STATIC retAF3 opAAbsF3(outAF3 d,inAF3 a){d[0]=AAbsF1(a[0]);d[1]=AAbsF1(a[1]);d[2]=AAbsF1(a[2]);return d;}
+ A_STATIC retAF4 opAAbsF4(outAF4 d,inAF4 a){d[0]=AAbsF1(a[0]);d[1]=AAbsF1(a[1]);d[2]=AAbsF1(a[2]);d[3]=AAbsF1(a[3]);return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAAddD2(outAD2 d,inAD2 a,inAD2 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];return d;}
+ A_STATIC retAD3 opAAddD3(outAD3 d,inAD3 a,inAD3 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];d[2]=a[2]+b[2];return d;}
+ A_STATIC retAD4 opAAddD4(outAD4 d,inAD4 a,inAD4 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];d[2]=a[2]+b[2];d[3]=a[3]+b[3];return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAAddF2(outAF2 d,inAF2 a,inAF2 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];return d;}
+ A_STATIC retAF3 opAAddF3(outAF3 d,inAF3 a,inAF3 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];d[2]=a[2]+b[2];return d;}
+ A_STATIC retAF4 opAAddF4(outAF4 d,inAF4 a,inAF4 b){d[0]=a[0]+b[0];d[1]=a[1]+b[1];d[2]=a[2]+b[2];d[3]=a[3]+b[3];return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAAddOneD2(outAD2 d,inAD2 a,AD1 b){d[0]=a[0]+b;d[1]=a[1]+b;return d;}
+ A_STATIC retAD3 opAAddOneD3(outAD3 d,inAD3 a,AD1 b){d[0]=a[0]+b;d[1]=a[1]+b;d[2]=a[2]+b;return d;}
+ A_STATIC retAD4 opAAddOneD4(outAD4 d,inAD4 a,AD1 b){d[0]=a[0]+b;d[1]=a[1]+b;d[2]=a[2]+b;d[3]=a[3]+b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAAddOneF2(outAF2 d,inAF2 a,AF1 b){d[0]=a[0]+b;d[1]=a[1]+b;return d;}
+ A_STATIC retAF3 opAAddOneF3(outAF3 d,inAF3 a,AF1 b){d[0]=a[0]+b;d[1]=a[1]+b;d[2]=a[2]+b;return d;}
+ A_STATIC retAF4 opAAddOneF4(outAF4 d,inAF4 a,AF1 b){d[0]=a[0]+b;d[1]=a[1]+b;d[2]=a[2]+b;d[3]=a[3]+b;return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opACpyD2(outAD2 d,inAD2 a){d[0]=a[0];d[1]=a[1];return d;}
+ A_STATIC retAD3 opACpyD3(outAD3 d,inAD3 a){d[0]=a[0];d[1]=a[1];d[2]=a[2];return d;}
+ A_STATIC retAD4 opACpyD4(outAD4 d,inAD4 a){d[0]=a[0];d[1]=a[1];d[2]=a[2];d[3]=a[3];return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opACpyF2(outAF2 d,inAF2 a){d[0]=a[0];d[1]=a[1];return d;}
+ A_STATIC retAF3 opACpyF3(outAF3 d,inAF3 a){d[0]=a[0];d[1]=a[1];d[2]=a[2];return d;}
+ A_STATIC retAF4 opACpyF4(outAF4 d,inAF4 a){d[0]=a[0];d[1]=a[1];d[2]=a[2];d[3]=a[3];return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opALerpD2(outAD2 d,inAD2 a,inAD2 b,inAD2 c){d[0]=ALerpD1(a[0],b[0],c[0]);d[1]=ALerpD1(a[1],b[1],c[1]);return d;}
+ A_STATIC retAD3 opALerpD3(outAD3 d,inAD3 a,inAD3 b,inAD3 c){d[0]=ALerpD1(a[0],b[0],c[0]);d[1]=ALerpD1(a[1],b[1],c[1]);d[2]=ALerpD1(a[2],b[2],c[2]);return d;}
+ A_STATIC retAD4 opALerpD4(outAD4 d,inAD4 a,inAD4 b,inAD4 c){d[0]=ALerpD1(a[0],b[0],c[0]);d[1]=ALerpD1(a[1],b[1],c[1]);d[2]=ALerpD1(a[2],b[2],c[2]);d[3]=ALerpD1(a[3],b[3],c[3]);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opALerpF2(outAF2 d,inAF2 a,inAF2 b,inAF2 c){d[0]=ALerpF1(a[0],b[0],c[0]);d[1]=ALerpF1(a[1],b[1],c[1]);return d;}
+ A_STATIC retAF3 opALerpF3(outAF3 d,inAF3 a,inAF3 b,inAF3 c){d[0]=ALerpF1(a[0],b[0],c[0]);d[1]=ALerpF1(a[1],b[1],c[1]);d[2]=ALerpF1(a[2],b[2],c[2]);return d;}
+ A_STATIC retAF4 opALerpF4(outAF4 d,inAF4 a,inAF4 b,inAF4 c){d[0]=ALerpF1(a[0],b[0],c[0]);d[1]=ALerpF1(a[1],b[1],c[1]);d[2]=ALerpF1(a[2],b[2],c[2]);d[3]=ALerpF1(a[3],b[3],c[3]);return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opALerpOneD2(outAD2 d,inAD2 a,inAD2 b,AD1 c){d[0]=ALerpD1(a[0],b[0],c);d[1]=ALerpD1(a[1],b[1],c);return d;}
+ A_STATIC retAD3 opALerpOneD3(outAD3 d,inAD3 a,inAD3 b,AD1 c){d[0]=ALerpD1(a[0],b[0],c);d[1]=ALerpD1(a[1],b[1],c);d[2]=ALerpD1(a[2],b[2],c);return d;}
+ A_STATIC retAD4 opALerpOneD4(outAD4 d,inAD4 a,inAD4 b,AD1 c){d[0]=ALerpD1(a[0],b[0],c);d[1]=ALerpD1(a[1],b[1],c);d[2]=ALerpD1(a[2],b[2],c);d[3]=ALerpD1(a[3],b[3],c);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opALerpOneF2(outAF2 d,inAF2 a,inAF2 b,AF1 c){d[0]=ALerpF1(a[0],b[0],c);d[1]=ALerpF1(a[1],b[1],c);return d;}
+ A_STATIC retAF3 opALerpOneF3(outAF3 d,inAF3 a,inAF3 b,AF1 c){d[0]=ALerpF1(a[0],b[0],c);d[1]=ALerpF1(a[1],b[1],c);d[2]=ALerpF1(a[2],b[2],c);return d;}
+ A_STATIC retAF4 opALerpOneF4(outAF4 d,inAF4 a,inAF4 b,AF1 c){d[0]=ALerpF1(a[0],b[0],c);d[1]=ALerpF1(a[1],b[1],c);d[2]=ALerpF1(a[2],b[2],c);d[3]=ALerpF1(a[3],b[3],c);return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAMaxD2(outAD2 d,inAD2 a,inAD2 b){d[0]=AMaxD1(a[0],b[0]);d[1]=AMaxD1(a[1],b[1]);return d;}
+ A_STATIC retAD3 opAMaxD3(outAD3 d,inAD3 a,inAD3 b){d[0]=AMaxD1(a[0],b[0]);d[1]=AMaxD1(a[1],b[1]);d[2]=AMaxD1(a[2],b[2]);return d;}
+ A_STATIC retAD4 opAMaxD4(outAD4 d,inAD4 a,inAD4 b){d[0]=AMaxD1(a[0],b[0]);d[1]=AMaxD1(a[1],b[1]);d[2]=AMaxD1(a[2],b[2]);d[3]=AMaxD1(a[3],b[3]);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAMaxF2(outAF2 d,inAF2 a,inAF2 b){d[0]=AMaxF1(a[0],b[0]);d[1]=AMaxF1(a[1],b[1]);return d;}
+ A_STATIC retAF3 opAMaxF3(outAF3 d,inAF3 a,inAF3 b){d[0]=AMaxF1(a[0],b[0]);d[1]=AMaxF1(a[1],b[1]);d[2]=AMaxF1(a[2],b[2]);return d;}
+ A_STATIC retAF4 opAMaxF4(outAF4 d,inAF4 a,inAF4 b){d[0]=AMaxF1(a[0],b[0]);d[1]=AMaxF1(a[1],b[1]);d[2]=AMaxF1(a[2],b[2]);d[3]=AMaxF1(a[3],b[3]);return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAMinD2(outAD2 d,inAD2 a,inAD2 b){d[0]=AMinD1(a[0],b[0]);d[1]=AMinD1(a[1],b[1]);return d;}
+ A_STATIC retAD3 opAMinD3(outAD3 d,inAD3 a,inAD3 b){d[0]=AMinD1(a[0],b[0]);d[1]=AMinD1(a[1],b[1]);d[2]=AMinD1(a[2],b[2]);return d;}
+ A_STATIC retAD4 opAMinD4(outAD4 d,inAD4 a,inAD4 b){d[0]=AMinD1(a[0],b[0]);d[1]=AMinD1(a[1],b[1]);d[2]=AMinD1(a[2],b[2]);d[3]=AMinD1(a[3],b[3]);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAMinF2(outAF2 d,inAF2 a,inAF2 b){d[0]=AMinF1(a[0],b[0]);d[1]=AMinF1(a[1],b[1]);return d;}
+ A_STATIC retAF3 opAMinF3(outAF3 d,inAF3 a,inAF3 b){d[0]=AMinF1(a[0],b[0]);d[1]=AMinF1(a[1],b[1]);d[2]=AMinF1(a[2],b[2]);return d;}
+ A_STATIC retAF4 opAMinF4(outAF4 d,inAF4 a,inAF4 b){d[0]=AMinF1(a[0],b[0]);d[1]=AMinF1(a[1],b[1]);d[2]=AMinF1(a[2],b[2]);d[3]=AMinF1(a[3],b[3]);return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAMulD2(outAD2 d,inAD2 a,inAD2 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];return d;}
+ A_STATIC retAD3 opAMulD3(outAD3 d,inAD3 a,inAD3 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];d[2]=a[2]*b[2];return d;}
+ A_STATIC retAD4 opAMulD4(outAD4 d,inAD4 a,inAD4 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];d[2]=a[2]*b[2];d[3]=a[3]*b[3];return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAMulF2(outAF2 d,inAF2 a,inAF2 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];return d;}
+ A_STATIC retAF3 opAMulF3(outAF3 d,inAF3 a,inAF3 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];d[2]=a[2]*b[2];return d;}
+ A_STATIC retAF4 opAMulF4(outAF4 d,inAF4 a,inAF4 b){d[0]=a[0]*b[0];d[1]=a[1]*b[1];d[2]=a[2]*b[2];d[3]=a[3]*b[3];return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opAMulOneD2(outAD2 d,inAD2 a,AD1 b){d[0]=a[0]*b;d[1]=a[1]*b;return d;}
+ A_STATIC retAD3 opAMulOneD3(outAD3 d,inAD3 a,AD1 b){d[0]=a[0]*b;d[1]=a[1]*b;d[2]=a[2]*b;return d;}
+ A_STATIC retAD4 opAMulOneD4(outAD4 d,inAD4 a,AD1 b){d[0]=a[0]*b;d[1]=a[1]*b;d[2]=a[2]*b;d[3]=a[3]*b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opAMulOneF2(outAF2 d,inAF2 a,AF1 b){d[0]=a[0]*b;d[1]=a[1]*b;return d;}
+ A_STATIC retAF3 opAMulOneF3(outAF3 d,inAF3 a,AF1 b){d[0]=a[0]*b;d[1]=a[1]*b;d[2]=a[2]*b;return d;}
+ A_STATIC retAF4 opAMulOneF4(outAF4 d,inAF4 a,AF1 b){d[0]=a[0]*b;d[1]=a[1]*b;d[2]=a[2]*b;d[3]=a[3]*b;return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opANegD2(outAD2 d,inAD2 a){d[0]=-a[0];d[1]=-a[1];return d;}
+ A_STATIC retAD3 opANegD3(outAD3 d,inAD3 a){d[0]=-a[0];d[1]=-a[1];d[2]=-a[2];return d;}
+ A_STATIC retAD4 opANegD4(outAD4 d,inAD4 a){d[0]=-a[0];d[1]=-a[1];d[2]=-a[2];d[3]=-a[3];return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opANegF2(outAF2 d,inAF2 a){d[0]=-a[0];d[1]=-a[1];return d;}
+ A_STATIC retAF3 opANegF3(outAF3 d,inAF3 a){d[0]=-a[0];d[1]=-a[1];d[2]=-a[2];return d;}
+ A_STATIC retAF4 opANegF4(outAF4 d,inAF4 a){d[0]=-a[0];d[1]=-a[1];d[2]=-a[2];d[3]=-a[3];return d;}
+//==============================================================================================================================
+ A_STATIC retAD2 opARcpD2(outAD2 d,inAD2 a){d[0]=ARcpD1(a[0]);d[1]=ARcpD1(a[1]);return d;}
+ A_STATIC retAD3 opARcpD3(outAD3 d,inAD3 a){d[0]=ARcpD1(a[0]);d[1]=ARcpD1(a[1]);d[2]=ARcpD1(a[2]);return d;}
+ A_STATIC retAD4 opARcpD4(outAD4 d,inAD4 a){d[0]=ARcpD1(a[0]);d[1]=ARcpD1(a[1]);d[2]=ARcpD1(a[2]);d[3]=ARcpD1(a[3]);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ A_STATIC retAF2 opARcpF2(outAF2 d,inAF2 a){d[0]=ARcpF1(a[0]);d[1]=ARcpF1(a[1]);return d;}
+ A_STATIC retAF3 opARcpF3(outAF3 d,inAF3 a){d[0]=ARcpF1(a[0]);d[1]=ARcpF1(a[1]);d[2]=ARcpF1(a[2]);return d;}
+ A_STATIC retAF4 opARcpF4(outAF4 d,inAF4 a){d[0]=ARcpF1(a[0]);d[1]=ARcpF1(a[1]);d[2]=ARcpF1(a[2]);d[3]=ARcpF1(a[3]);return d;}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                     HALF FLOAT PACKING
 //==============================================================================================================================
  // Convert float to half (in lower 16-bits of output).
  // Same fast technique as documented here: ftp://ftp.fox-toolkit.org/pub/fasthalffloatconversion.pdf
@@ -172,7 +515,7 @@
  // Conversion rules are to make computations possibly "safer" on the GPU,
  //  -INF & -NaN -> -65504
  //  +INF & +NaN -> +65504
- static AU1 AU1_AH1_AF1(AF1 f){
+ A_STATIC AU1 AU1_AH1_AF1(AF1 f){
   static AW1 base[512]={
    0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
    0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
@@ -242,8 +585,10 @@
   union{AF1 f;AU1 u;}bits;bits.f=f;AU1 u=bits.u;AU1 i=u>>23;return (AU1)(base[i])+((u&0x7fffff)>>shift[i]);}
 //------------------------------------------------------------------------------------------------------------------------------
  // Used to output packed constant.
- static AU1 AU1_AH2_AF2(AF1 lo, AF1 hi){return AU1_AH1_AF1(lo)+(AU1_AH1_AF1(hi)<<16);}
+ A_STATIC AU1 AU1_AH2_AF2(inAF2 a){return AU1_AH1_AF1(a[0])+(AU1_AH1_AF1(a[1])<<16);}
 #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +596,9 @@
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
 //
+//
 //                                                            GLSL
+//
 //
 //==============================================================================================================================
 #if defined(A_GLSL) && defined(A_GPU)
@@ -305,6 +652,10 @@
  #define AU3_AF3(x) floatBitsToUint(AF3(x))
  #define AU4_AF4(x) floatBitsToUint(AF4(x))
 //------------------------------------------------------------------------------------------------------------------------------
+ // TODO: How to make sure this is optimal??????????????????????????????????????????????????????????????????????????????????????
+ AU1 AU1_AH1_AF1_x(AF1 a){return packHalf2x16(AF2(a,0.0));}
+ #define AU1_AH1_AF1(a) AU1_AH1_AF1_x(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
  #define AU1_AH2_AF2 packHalf2x16
  #define AU1_AW2Unorm_AF2 packUnorm2x16
  #define AU1_AB4Unorm_AF4 packUnorm4x8
@@ -331,6 +682,11 @@
  #define AU3_(a) AU3_x(AU1(a))
  #define AU4_(a) AU4_x(AU1(a))
 //==============================================================================================================================
+ AU1 AAbsSU1(AU1 a){return AU1(abs(ASU1(a)));}
+ AU2 AAbsSU2(AU2 a){return AU2(abs(ASU2(a)));}
+ AU3 AAbsSU3(AU3 a){return AU3(abs(ASU3(a)));}
+ AU4 AAbsSU4(AU4 a){return AU4(abs(ASU4(a)));}
+//------------------------------------------------------------------------------------------------------------------------------
  AU1 ABfe(AU1 src,AU1 off,AU1 bits){return bitfieldExtract(src,ASU1(off),ASU1(bits));}
  AU1 ABfi(AU1 src,AU1 ins,AU1 mask){return (ins&mask)|(src&(~mask));}
  // Proxy for V_BFI_B32 where the 'mask' is set as 'bits', 'mask=(1<<bits)-1', and 'bits' needs to be an immediate.
@@ -363,6 +719,11 @@
  AU3 AMax3U3(AU3 x,AU3 y,AU3 z){return max(x,max(y,z));}
  AU4 AMax3U4(AU4 x,AU4 y,AU4 z){return max(x,max(y,z));}
 //------------------------------------------------------------------------------------------------------------------------------
+ AU1 AMaxSU1(AU1 a,AU1 b){return AU1(max(ASU1(a),ASU1(b)));}
+ AU2 AMaxSU2(AU2 a,AU2 b){return AU2(max(ASU2(a),ASU2(b)));}
+ AU3 AMaxSU3(AU3 a,AU3 b){return AU3(max(ASU3(a),ASU3(b)));}
+ AU4 AMaxSU4(AU4 a,AU4 b){return AU4(max(ASU4(a),ASU4(b)));}
+//------------------------------------------------------------------------------------------------------------------------------
  // Clamp has an easier pattern match for med3 when some ordering is known.
  // V_MED3_F32.
  AF1 AMed3F1(AF1 x,AF1 y,AF1 z){return max(min(x,y),min(max(x,y),z));}
@@ -385,6 +746,11 @@
  AU2 AMin3U2(AU2 x,AU2 y,AU2 z){return min(x,min(y,z));}
  AU3 AMin3U3(AU3 x,AU3 y,AU3 z){return min(x,min(y,z));}
  AU4 AMin3U4(AU4 x,AU4 y,AU4 z){return min(x,min(y,z));}
+//------------------------------------------------------------------------------------------------------------------------------
+ AU1 AMinSU1(AU1 a,AU1 b){return AU1(min(ASU1(a),ASU1(b)));}
+ AU2 AMinSU2(AU2 a,AU2 b){return AU2(min(ASU2(a),ASU2(b)));}
+ AU3 AMinSU3(AU3 a,AU3 b){return AU3(min(ASU3(a),ASU3(b)));}
+ AU4 AMinSU4(AU4 a,AU4 b){return AU4(min(ASU4(a),ASU4(b)));}
 //------------------------------------------------------------------------------------------------------------------------------
  // Normalized trig. Valid input domain is {-256 to +256}. No GLSL compiler intrinsic exists to map to this currently.
  // V_COS_F32.
@@ -414,6 +780,11 @@
  AF2 ASatF2(AF2 x){return clamp(x,AF2_(0.0),AF2_(1.0));}
  AF3 ASatF3(AF3 x){return clamp(x,AF3_(0.0),AF3_(1.0));}
  AF4 ASatF4(AF4 x){return clamp(x,AF4_(0.0),AF4_(1.0));}
+//------------------------------------------------------------------------------------------------------------------------------
+ AU1 AShrSU1(AU1 a,AU1 b){return AU1(ASU1(a)>>ASU1(b));}
+ AU2 AShrSU2(AU2 a,AU2 b){return AU2(ASU2(a)>>ASU2(b));}
+ AU3 AShrSU3(AU3 a,AU3 b){return AU3(ASU3(a)>>ASU3(b));}
+ AU4 AShrSU4(AU4 a,AU4 b){return AU4(ASU4(a)>>ASU4(b));}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
@@ -502,10 +873,20 @@
   #define AW3_(a) AW3_x(AW1(a))
   #define AW4_(a) AW4_x(AW1(a))
 //==============================================================================================================================
+  AW1 AAbsSW1(AW1 a){return AW1(abs(ASW1(a)));}
+  AW2 AAbsSW2(AW2 a){return AW2(abs(ASW2(a)));}
+  AW3 AAbsSW3(AW3 a){return AW3(abs(ASW3(a)));}
+  AW4 AAbsSW4(AW4 a){return AW4(abs(ASW4(a)));}
+//------------------------------------------------------------------------------------------------------------------------------
   AH1 AFractH1(AH1 x){return fract(x);}
   AH2 AFractH2(AH2 x){return fract(x);}
   AH3 AFractH3(AH3 x){return fract(x);}
   AH4 AFractH4(AH4 x){return fract(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AH1 ALerpH1(AH1 x,AH1 y,AH1 a){return mix(x,y,a);}
+  AH2 ALerpH2(AH2 x,AH2 y,AH2 a){return mix(x,y,a);}
+  AH3 ALerpH3(AH3 x,AH3 y,AH3 a){return mix(x,y,a);}
+  AH4 ALerpH4(AH4 x,AH4 y,AH4 a){return mix(x,y,a);}
 //------------------------------------------------------------------------------------------------------------------------------
   // No packed version of max3.
   AH1 AMax3H1(AH1 x,AH1 y,AH1 z){return max(x,max(y,z));}
@@ -513,11 +894,21 @@
   AH3 AMax3H3(AH3 x,AH3 y,AH3 z){return max(x,max(y,z));}
   AH4 AMax3H4(AH4 x,AH4 y,AH4 z){return max(x,max(y,z));}
 //------------------------------------------------------------------------------------------------------------------------------
+  AW1 AMaxSW1(AW1 a,AW1 b){return AW1(max(ASU1(a),ASU1(b)));}
+  AW2 AMaxSW2(AW2 a,AW2 b){return AW2(max(ASU2(a),ASU2(b)));}
+  AW3 AMaxSW3(AW3 a,AW3 b){return AW3(max(ASU3(a),ASU3(b)));}
+  AW4 AMaxSW4(AW4 a,AW4 b){return AW4(max(ASU4(a),ASU4(b)));}
+//------------------------------------------------------------------------------------------------------------------------------
   // No packed version of min3.
   AH1 AMin3H1(AH1 x,AH1 y,AH1 z){return min(x,min(y,z));}
   AH2 AMin3H2(AH2 x,AH2 y,AH2 z){return min(x,min(y,z));}
   AH3 AMin3H3(AH3 x,AH3 y,AH3 z){return min(x,min(y,z));}
   AH4 AMin3H4(AH4 x,AH4 y,AH4 z){return min(x,min(y,z));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AW1 AMinSW1(AW1 a,AW1 b){return AW1(min(ASU1(a),ASU1(b)));}
+  AW2 AMinSW2(AW2 a,AW2 b){return AW2(min(ASU2(a),ASU2(b)));}
+  AW3 AMinSW3(AW3 a,AW3 b){return AW3(min(ASU3(a),ASU3(b)));}
+  AW4 AMinSW4(AW4 a,AW4 b){return AW4(min(ASU4(a),ASU4(b)));}
 //------------------------------------------------------------------------------------------------------------------------------
   AH1 ARcpH1(AH1 x){return AH1_(1.0)/x;}
   AH2 ARcpH2(AH2 x){return AH2_(1.0)/x;}
@@ -533,6 +924,11 @@
   AH2 ASatH2(AH2 x){return clamp(x,AH2_(0.0),AH2_(1.0));}
   AH3 ASatH3(AH3 x){return clamp(x,AH3_(0.0),AH3_(1.0));}
   AH4 ASatH4(AH4 x){return clamp(x,AH4_(0.0),AH4_(1.0));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AW1 AShrSW1(AW1 a,AW1 b){return AW1(ASW1(a)>>ASW1(b));}
+  AW2 AShrSW2(AW2 a,AW2 b){return AW2(ASW2(a)>>ASW2(b));}
+  AW3 AShrSW3(AW3 a,AW3 b){return AW3(ASW3(a)>>ASW3(b));}
+  AW4 AShrSW4(AW4 a,AW4 b){return AW4(ASW4(a)>>ASW4(b));}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -554,6 +950,31 @@
   #define AD2_(a) AD2_x(AD1(a))
   #define AD3_(a) AD3_x(AD1(a))
   #define AD4_(a) AD4_x(AD1(a))
+//==============================================================================================================================
+  AD1 AFractD1(AD1 x){return fract(x);}
+  AD2 AFractD2(AD2 x){return fract(x);}
+  AD3 AFractD3(AD3 x){return fract(x);}
+  AD4 AFractD4(AD4 x){return fract(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ALerpD1(AD1 x,AD1 y,AD1 a){return mix(x,y,a);}
+  AD2 ALerpD2(AD2 x,AD2 y,AD2 a){return mix(x,y,a);}
+  AD3 ALerpD3(AD3 x,AD3 y,AD3 a){return mix(x,y,a);}
+  AD4 ALerpD4(AD4 x,AD4 y,AD4 a){return mix(x,y,a);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ARcpD1(AD1 x){return AD1_(1.0)/x;}
+  AD2 ARcpD2(AD2 x){return AD2_(1.0)/x;}
+  AD3 ARcpD3(AD3 x){return AD3_(1.0)/x;}
+  AD4 ARcpD4(AD4 x){return AD4_(1.0)/x;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ARsqD1(AD1 x){return AD1_(1.0)/sqrt(x);}
+  AD2 ARsqD2(AD2 x){return AD2_(1.0)/sqrt(x);}
+  AD3 ARsqD3(AD3 x){return AD3_(1.0)/sqrt(x);}
+  AD4 ARsqD4(AD4 x){return AD4_(1.0)/sqrt(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ASatD1(AD1 x){return clamp(x,AD1_(0.0),AD1_(1.0));}
+  AD2 ASatD2(AD2 x){return clamp(x,AD2_(0.0),AD2_(1.0));}
+  AD3 ASatD3(AD3 x){return clamp(x,AD3_(0.0),AD3_(1.0));}
+  AD4 ASatD4(AD4 x){return clamp(x,AD4_(0.0),AD4_(1.0));}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -583,6 +1004,21 @@
   #define AL2_(a) AL2_x(AL1(a))
   #define AL3_(a) AL3_x(AL1(a))
   #define AL4_(a) AL4_x(AL1(a))
+//==============================================================================================================================
+  AL1 AAbsSL1(AL1 a){return AL1(abs(ASL1(a)));}
+  AL2 AAbsSL2(AL2 a){return AL2(abs(ASL2(a)));}
+  AL3 AAbsSL3(AL3 a){return AL3(abs(ASL3(a)));}
+  AL4 AAbsSL4(AL4 a){return AL4(abs(ASL4(a)));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AL1 AMaxSL1(AL1 a,AL1 b){return AL1(max(ASU1(a),ASU1(b)));}
+  AL2 AMaxSL2(AL2 a,AL2 b){return AL2(max(ASU2(a),ASU2(b)));}
+  AL3 AMaxSL3(AL3 a,AL3 b){return AL3(max(ASU3(a),ASU3(b)));}
+  AL4 AMaxSL4(AL4 a,AL4 b){return AL4(max(ASU4(a),ASU4(b)));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AL1 AMinSL1(AL1 a,AL1 b){return AL1(min(ASU1(a),ASU1(b)));}
+  AL2 AMinSL2(AL2 a,AL2 b){return AL2(min(ASU2(a),ASU2(b)));}
+  AL3 AMinSL3(AL3 a,AL3 b){return AL3(min(ASU3(a),ASU3(b)));}
+  AL4 AMinSL4(AL4 a,AL4 b){return AL4(min(ASU4(a),ASU4(b)));}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -591,10 +1027,15 @@
 //                                                      WAVE OPERATIONS
 //==============================================================================================================================
  #ifdef A_WAVE
-  AF1 AWaveAdd(AF1 v){return subgroupAdd(v);}
-  AF2 AWaveAdd(AF2 v){return subgroupAdd(v);}
-  AF3 AWaveAdd(AF3 v){return subgroupAdd(v);}
-  AF4 AWaveAdd(AF4 v){return subgroupAdd(v);}
+  // Where 'x' must be a compile time literal.
+  AF1 AWaveXorF1(AF1 v,AU1 x){return subgroupShuffleXor(v,x);}
+  AF2 AWaveXorF2(AF2 v,AU1 x){return subgroupShuffleXor(v,x);}
+  AU1 AWaveXorU1(AU1 v,AU1 x){return subgroupShuffleXor(v,x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  #ifdef A_HALF
+   AH2 AWaveXorH2(AH2 v,AU1 x){return AH2_AU1(subgroupShuffleXor(AU1_AH2(v),x));}
+   AW2 AWaveXorW2(AW2 v,AU1 x){return AW2_AU1(subgroupShuffleXor(AU1_AH2(v),x));}
+  #endif
  #endif
 //==============================================================================================================================
 #endif
@@ -602,10 +1043,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
 //
+//
 //                                                            HLSL
+//
 //
 //==============================================================================================================================
 #if defined(A_HLSL) && defined(A_GPU)
@@ -639,6 +1084,9 @@
  #define AU3_AF3(x) asuint(AF3(x))
  #define AU4_AF4(x) asuint(AF4(x))
 //------------------------------------------------------------------------------------------------------------------------------
+ AU1 AU1_AH1_AF1_x(AF1 a){return f32tof16(a);}
+ #define AU1_AH1_AF1(a) AU1_AH1_AF1_x(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
  AU1 AU1_AH2_AF2_x(AF2 a){return f32tof16(a.x)|(f32tof16(a.y)<<16);}
  #define AU1_AH2_AF2(a) AU1_AH2_AF2_x(AF2(a)) 
  #define AU1_AB4Unorm_AF4(x) D3DCOLORtoUBYTE4(AF4(x))
@@ -664,6 +1112,11 @@
  #define AU3_(a) AU3_x(AU1(a))
  #define AU4_(a) AU4_x(AU1(a))
 //==============================================================================================================================
+ AU1 AAbsSU1(AU1 a){return AU1(abs(ASU1(a)));}
+ AU2 AAbsSU2(AU2 a){return AU2(abs(ASU2(a)));}
+ AU3 AAbsSU3(AU3 a){return AU3(abs(ASU3(a)));}
+ AU4 AAbsSU4(AU4 a){return AU4(abs(ASU4(a)));}
+//------------------------------------------------------------------------------------------------------------------------------
  AU1 ABfe(AU1 src,AU1 off,AU1 bits){AU1 mask=(1<<bits)-1;return (src>>off)&mask;}
  AU1 ABfi(AU1 src,AU1 ins,AU1 mask){return (ins&mask)|(src&(~mask));}
  AU1 ABfiM(AU1 src,AU1 ins,AU1 bits){AU1 mask=(1<<bits)-1;return (ins&mask)|(src&(~mask));}
@@ -693,6 +1146,11 @@
  AU3 AMax3U3(AU3 x,AU3 y,AU3 z){return max(x,max(y,z));}
  AU4 AMax3U4(AU4 x,AU4 y,AU4 z){return max(x,max(y,z));}
 //------------------------------------------------------------------------------------------------------------------------------
+ AU1 AMaxSU1(AU1 a,AU1 b){return AU1(max(ASU1(a),ASU1(b)));}
+ AU2 AMaxSU2(AU2 a,AU2 b){return AU2(max(ASU2(a),ASU2(b)));}
+ AU3 AMaxSU3(AU3 a,AU3 b){return AU3(max(ASU3(a),ASU3(b)));}
+ AU4 AMaxSU4(AU4 a,AU4 b){return AU4(max(ASU4(a),ASU4(b)));}
+//------------------------------------------------------------------------------------------------------------------------------
  AF1 AMed3F1(AF1 x,AF1 y,AF1 z){return max(min(x,y),min(max(x,y),z));}
  AF2 AMed3F2(AF2 x,AF2 y,AF2 z){return max(min(x,y),min(max(x,y),z));}
  AF3 AMed3F3(AF3 x,AF3 y,AF3 z){return max(min(x,y),min(max(x,y),z));}
@@ -712,6 +1170,11 @@
  AU2 AMin3U2(AU2 x,AU2 y,AU2 z){return min(x,min(y,z));}
  AU3 AMin3U3(AU3 x,AU3 y,AU3 z){return min(x,min(y,z));}
  AU4 AMin3U4(AU4 x,AU4 y,AU4 z){return min(x,min(y,z));}
+//------------------------------------------------------------------------------------------------------------------------------
+ AU1 AMinSU1(AU1 a,AU1 b){return AU1(min(ASU1(a),ASU1(b)));}
+ AU2 AMinSU2(AU2 a,AU2 b){return AU2(min(ASU2(a),ASU2(b)));}
+ AU3 AMinSU3(AU3 a,AU3 b){return AU3(min(ASU3(a),ASU3(b)));}
+ AU4 AMinSU4(AU4 a,AU4 b){return AU4(min(ASU4(a),ASU4(b)));}
 //------------------------------------------------------------------------------------------------------------------------------
  AF1 ANCosF1(AF1 x){return cos(x*AF1_(A_2PI));}
  AF2 ANCosF2(AF2 x){return cos(x*AF2_(A_2PI));}
@@ -737,6 +1200,11 @@
  AF2 ASatF2(AF2 x){return saturate(x);}
  AF3 ASatF3(AF3 x){return saturate(x);}
  AF4 ASatF4(AF4 x){return saturate(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+ AU1 AShrSU1(AU1 a,AU1 b){return AU1(ASU1(a)>>ASU1(b));}
+ AU2 AShrSU2(AU2 a,AU2 b){return AU2(ASU2(a)>>ASU2(b));}
+ AU3 AShrSU3(AU3 a,AU3 b){return AU3(ASU3(a)>>ASU3(b));}
+ AU4 AShrSU4(AU4 a,AU4 b){return AU4(ASU4(a)>>ASU4(b));}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
@@ -787,11 +1255,13 @@
   #define AU1_AW2(x) AU1_AW2_x(AW2(x))
   #define AU2_AW4(x) AU2_AW4_x(AW4(x))
 //==============================================================================================================================
+  // TODO: These are broken!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   #define AW1_AH1(x) AW1(asuint(AF1(x)))
   #define AW2_AH2(x) AW2(asuint(AF2(x)))
   #define AW3_AH3(x) AW3(asuint(AF3(x)))
   #define AW4_AH4(x) AW4(asuint(AF4(x)))
 //------------------------------------------------------------------------------------------------------------------------------
+  // TODO: These are broken!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   #define AH1_AW1(x) AH1(asfloat(AU1(x)))
   #define AH2_AW2(x) AH2(asfloat(AU2(x)))
   #define AH3_AW3(x) AH3(asfloat(AU3(x)))
@@ -815,21 +1285,41 @@
   #define AW3_(a) AW3_x(AW1(a))
   #define AW4_(a) AW4_x(AW1(a))
 //==============================================================================================================================
+  AW1 AAbsSW1(AW1 a){return AW1(abs(ASW1(a)));}
+  AW2 AAbsSW2(AW2 a){return AW2(abs(ASW2(a)));}
+  AW3 AAbsSW3(AW3 a){return AW3(abs(ASW3(a)));}
+  AW4 AAbsSW4(AW4 a){return AW4(abs(ASW4(a)));}
+//------------------------------------------------------------------------------------------------------------------------------
  // V_FRACT_F16 (note DX frac() is different).
   AH1 AFractH1(AH1 x){return x-floor(x);}
   AH2 AFractH2(AH2 x){return x-floor(x);}
   AH3 AFractH3(AH3 x){return x-floor(x);}
   AH4 AFractH4(AH4 x){return x-floor(x);}
 //------------------------------------------------------------------------------------------------------------------------------
+  AH1 ALerpH1(AH1 x,AH1 y,AH1 a){return lerp(x,y,a);}
+  AH2 ALerpH2(AH2 x,AH2 y,AH2 a){return lerp(x,y,a);}
+  AH3 ALerpH3(AH3 x,AH3 y,AH3 a){return lerp(x,y,a);}
+  AH4 ALerpH4(AH4 x,AH4 y,AH4 a){return lerp(x,y,a);}
+//------------------------------------------------------------------------------------------------------------------------------
   AH1 AMax3H1(AH1 x,AH1 y,AH1 z){return max(x,max(y,z));}
   AH2 AMax3H2(AH2 x,AH2 y,AH2 z){return max(x,max(y,z));}
   AH3 AMax3H3(AH3 x,AH3 y,AH3 z){return max(x,max(y,z));}
   AH4 AMax3H4(AH4 x,AH4 y,AH4 z){return max(x,max(y,z));}
 //------------------------------------------------------------------------------------------------------------------------------
+  AW1 AMaxSW1(AW1 a,AW1 b){return AW1(max(ASU1(a),ASU1(b)));}
+  AW2 AMaxSW2(AW2 a,AW2 b){return AW2(max(ASU2(a),ASU2(b)));}
+  AW3 AMaxSW3(AW3 a,AW3 b){return AW3(max(ASU3(a),ASU3(b)));}
+  AW4 AMaxSW4(AW4 a,AW4 b){return AW4(max(ASU4(a),ASU4(b)));}
+//------------------------------------------------------------------------------------------------------------------------------
   AH1 AMin3H1(AH1 x,AH1 y,AH1 z){return min(x,min(y,z));}
   AH2 AMin3H2(AH2 x,AH2 y,AH2 z){return min(x,min(y,z));}
   AH3 AMin3H3(AH3 x,AH3 y,AH3 z){return min(x,min(y,z));}
   AH4 AMin3H4(AH4 x,AH4 y,AH4 z){return min(x,min(y,z));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AW1 AMinSW1(AW1 a,AW1 b){return AW1(min(ASU1(a),ASU1(b)));}
+  AW2 AMinSW2(AW2 a,AW2 b){return AW2(min(ASU2(a),ASU2(b)));}
+  AW3 AMinSW3(AW3 a,AW3 b){return AW3(min(ASU3(a),ASU3(b)));}
+  AW4 AMinSW4(AW4 a,AW4 b){return AW4(min(ASU4(a),ASU4(b)));}
 //------------------------------------------------------------------------------------------------------------------------------
   AH1 ARcpH1(AH1 x){return rcp(x);}
   AH2 ARcpH2(AH2 x){return rcp(x);}
@@ -845,6 +1335,11 @@
   AH2 ASatH2(AH2 x){return saturate(x);}
   AH3 ASatH3(AH3 x){return saturate(x);}
   AH4 ASatH4(AH4 x){return saturate(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AW1 AShrSW1(AW1 a,AW1 b){return AW1(ASW1(a)>>ASW1(b));}
+  AW2 AShrSW2(AW2 a,AW2 b){return AW2(ASW2(a)>>ASW2(b));}
+  AW3 AShrSW3(AW3 a,AW3 b){return AW3(ASW3(a)>>ASW3(b));}
+  AW4 AShrSW4(AW4 a,AW4 b){return AW4(ASW4(a)>>ASW4(b));}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -866,6 +1361,31 @@
   #define AD2_(a) AD2_x(AD1(a))
   #define AD3_(a) AD3_x(AD1(a))
   #define AD4_(a) AD4_x(AD1(a))
+//==============================================================================================================================
+  AD1 AFractD1(AD1 a){return a-floor(a);}
+  AD2 AFractD2(AD2 a){return a-floor(a);}
+  AD3 AFractD3(AD3 a){return a-floor(a);}
+  AD4 AFractD4(AD4 a){return a-floor(a);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ALerpD1(AD1 x,AD1 y,AD1 a){return lerp(x,y,a);}
+  AD2 ALerpD2(AD2 x,AD2 y,AD2 a){return lerp(x,y,a);}
+  AD3 ALerpD3(AD3 x,AD3 y,AD3 a){return lerp(x,y,a);}
+  AD4 ALerpD4(AD4 x,AD4 y,AD4 a){return lerp(x,y,a);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ARcpD1(AD1 x){return rcp(x);}
+  AD2 ARcpD2(AD2 x){return rcp(x);}
+  AD3 ARcpD3(AD3 x){return rcp(x);}
+  AD4 ARcpD4(AD4 x){return rcp(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ARsqD1(AD1 x){return rsqrt(x);}
+  AD2 ARsqD2(AD2 x){return rsqrt(x);}
+  AD3 ARsqD3(AD3 x){return rsqrt(x);}
+  AD4 ARsqD4(AD4 x){return rsqrt(x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD1 ASatD1(AD1 x){return saturate(x);}
+  AD2 ASatD2(AD2 x){return saturate(x);}
+  AD3 ASatD3(AD3 x){return saturate(x);}
+  AD4 ASatD4(AD4 x){return saturate(x);}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -875,8 +1395,35 @@
 //==============================================================================================================================
  #ifdef A_LONG
  #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                         HLSL WAVE
+//==============================================================================================================================
+ #ifdef A_WAVE
+  // Where 'x' must be a compile time literal.
+  AF1 AWaveXorF1(AF1 v,AU1 x){return WaveReadLaneAt(v,WaveGetLaneIndex()^x);}
+  #if 0
+   // Should be this.
+   AF2 AWaveXorF2(AF2 v,AU1 x){return WaveReadLaneAt(v,WaveGetLaneIndex()^x);}
+  #else
+   // TODO: Does this workaround actually function??????????????????????????????????????????????????????????????????????????????
+   AF2 AWaveXorF2(AF2 v,AU1 x){return AF2(
+    //WaveReadLaneAt(v.x,WaveGetLaneIndex()^x),WaveReadLaneAt(v.y,WaveGetLaneIndex()^x));} // original source
+       0.0f, 0.0f); } // Volkan: Unfortunately not. Temp fix for now.
+  #endif
+  AU1 AWaveXorU1(AU1 v,AU1 x){return WaveReadLaneAt(v,WaveGetLaneIndex()^x);}
+//------------------------------------------------------------------------------------------------------------------------------
+  #ifdef A_HALF
+   AH2 AWaveXorH2(AH2 v,AU1 x){return AH2_AU1(WaveReadLaneAt(AU1_AH2(v),WaveGetLaneIndex()^x));}
+   AW2 AWaveXorW2(AW2 v,AU1 x){return AW2_AU1(WaveReadLaneAt(AU1_AH2(v),WaveGetLaneIndex()^x));}
+  #endif
+ #endif
 //==============================================================================================================================
 #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -884,13 +1431,15 @@
 //_____________________________________________________________/\_______________________________________________________________
 //==============================================================================================================================
 //
+//
 //                                                          GPU COMMON
+//
 //
 //==============================================================================================================================
 #ifdef A_GPU
  // Negative and positive infinity.
- #define A_INFN_F AF1_AU1(0x7f800000u)
- #define A_INFP_F AF1_AU1(0xff800000u)
+ #define A_INFP_F AF1_AU1(0x7f800000u)
+ #define A_INFN_F AF1_AU1(0xff800000u)
 //------------------------------------------------------------------------------------------------------------------------------
  // Copy sign from 's' to positive 'd'.
  AF1 ACpySgnF1(AF1 d,AF1 s){return AF1_AU1(AU1_AF1(d)|(AU1_AF1(s)&AU1_(0x80000000u)));}
@@ -910,10 +1459,15 @@
  AF2 ASignedF2(AF2 m){return ASatF2(m*AF2_(A_INFN_F));}
  AF3 ASignedF3(AF3 m){return ASatF3(m*AF3_(A_INFN_F));}
  AF4 ASignedF4(AF4 m){return ASatF4(m*AF4_(A_INFN_F));}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF1 AGtZeroF1(AF1 m){return ASatF1(m*AF1_(A_INFP_F));}
+ AF2 AGtZeroF2(AF2 m){return ASatF2(m*AF2_(A_INFP_F));}
+ AF3 AGtZeroF3(AF3 m){return ASatF3(m*AF3_(A_INFP_F));}
+ AF4 AGtZeroF4(AF4 m){return ASatF4(m*AF4_(A_INFP_F));}
 //==============================================================================================================================
  #ifdef A_HALF
-  #define A_INFN_H AH1_AW1(0x7c00u)
-  #define A_INFP_H AH1_AW1(0xfc00u)
+  #define A_INFP_H AH1_AW1(0x7c00u)
+  #define A_INFN_H AH1_AW1(0xfc00u)
 //------------------------------------------------------------------------------------------------------------------------------
   AH1 ACpySgnH1(AH1 d,AH1 s){return AH1_AW1(AW1_AH1(d)|(AW1_AH1(s)&AW1_(0x8000u)));}
   AH2 ACpySgnH2(AH2 d,AH2 s){return AH2_AW2(AW2_AH2(d)|(AW2_AH2(s)&AW2_(0x8000u)));}
@@ -924,6 +1478,274 @@
   AH2 ASignedH2(AH2 m){return ASatH2(m*AH2_(A_INFN_H));}
   AH3 ASignedH3(AH3 m){return ASatH3(m*AH3_(A_INFN_H));}
   AH4 ASignedH4(AH4 m){return ASatH4(m*AH4_(A_INFN_H));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AH1 AGtZeroH1(AH1 m){return ASatH1(m*AH1_(A_INFP_H));}
+  AH2 AGtZeroH2(AH2 m){return ASatH2(m*AH2_(A_INFP_H));}
+  AH3 AGtZeroH3(AH3 m){return ASatH3(m*AH3_(A_INFP_H));}
+  AH4 AGtZeroH4(AH4 m){return ASatH4(m*AH4_(A_INFP_H));}
+ #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                [FIS] FLOAT INTEGER SORTABLE
+//------------------------------------------------------------------------------------------------------------------------------
+// Float to integer sortable.
+//  - If sign bit=0, flip the sign bit (positives).
+//  - If sign bit=1, flip all bits     (negatives).
+// Integer sortable to float.
+//  - If sign bit=1, flip the sign bit (positives).
+//  - If sign bit=0, flip all bits     (negatives).
+// Has nice side effects.
+//  - Larger integers are more positive values.
+//  - Float zero is mapped to center of integers (so clear to integer zero is a nice default for atomic max usage).
+// Burns 3 ops for conversion {shift,or,xor}.
+//==============================================================================================================================
+ AU1 AFisToU1(AU1 x){return x^(( AShrSU1(x,AU1_(31)))|AU1_(0x80000000));}
+ AU1 AFisFromU1(AU1 x){return x^((~AShrSU1(x,AU1_(31)))|AU1_(0x80000000));}
+//------------------------------------------------------------------------------------------------------------------------------
+ // Just adjust high 16-bit value (useful when upper part of 32-bit word is a 16-bit float value).
+ AU1 AFisToHiU1(AU1 x){return x^(( AShrSU1(x,AU1_(15)))|AU1_(0x80000000));}
+ AU1 AFisFromHiU1(AU1 x){return x^((~AShrSU1(x,AU1_(15)))|AU1_(0x80000000));}
+//------------------------------------------------------------------------------------------------------------------------------
+ #ifdef A_HALF
+  AW1 AFisToW1(AW1 x){return x^(( AShrSW1(x,AW1_(15)))|AW1_(0x8000));}
+  AW1 AFisFromW1(AW1 x){return x^((~AShrSW1(x,AW1_(15)))|AW1_(0x8000));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AW2 AFisToW2(AW2 x){return x^(( AShrSW2(x,AW2_(15)))|AW2_(0x8000));}
+  AW2 AFisFromW2(AW2 x){return x^((~AShrSW2(x,AW2_(15)))|AW2_(0x8000));}
+ #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                      [PERM] V_PERM_B32
+//------------------------------------------------------------------------------------------------------------------------------
+// Support for V_PERM_B32 started in the 3rd generation of GCN.
+//------------------------------------------------------------------------------------------------------------------------------
+// yyyyxxxx - The 'i' input.
+// 76543210
+// ========
+// HGFEDCBA - Naming on permutation.
+//------------------------------------------------------------------------------------------------------------------------------
+// TODO
+// ====
+//  - Make sure compiler optimizes this.
+//==============================================================================================================================
+ #ifdef A_HALF
+  AU1 APerm0E0A(AU2 i){return((i.x    )&0xffu)|((i.y<<16)&0xff0000u);}
+  AU1 APerm0F0B(AU2 i){return((i.x>> 8)&0xffu)|((i.y<< 8)&0xff0000u);}
+  AU1 APerm0G0C(AU2 i){return((i.x>>16)&0xffu)|((i.y    )&0xff0000u);}
+  AU1 APerm0H0D(AU2 i){return((i.x>>24)&0xffu)|((i.y>> 8)&0xff0000u);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AU1 APermHGFA(AU2 i){return((i.x    )&0x000000ffu)|(i.y&0xffffff00u);}
+  AU1 APermHGFC(AU2 i){return((i.x>>16)&0x000000ffu)|(i.y&0xffffff00u);}
+  AU1 APermHGAE(AU2 i){return((i.x<< 8)&0x0000ff00u)|(i.y&0xffff00ffu);}
+  AU1 APermHGCE(AU2 i){return((i.x>> 8)&0x0000ff00u)|(i.y&0xffff00ffu);}
+  AU1 APermHAFE(AU2 i){return((i.x<<16)&0x00ff0000u)|(i.y&0xff00ffffu);}
+  AU1 APermHCFE(AU2 i){return((i.x    )&0x00ff0000u)|(i.y&0xff00ffffu);}
+  AU1 APermAGFE(AU2 i){return((i.x<<24)&0xff000000u)|(i.y&0x00ffffffu);}
+  AU1 APermCGFE(AU2 i){return((i.x<< 8)&0xff000000u)|(i.y&0x00ffffffu);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AU1 APermGCEA(AU2 i){return((i.x)&0x00ff00ffu)|((i.y<<8)&0xff00ff00u);}
+ #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                               [BUC] BYTE UNSIGNED CONVERSION
+//------------------------------------------------------------------------------------------------------------------------------
+// Designed to use the optimal conversion, enables the scaling to possibly be factored into other computation.
+// Works on a range of 0 to A_BUC_{U1,U2}*(255.0/256.0).
+//------------------------------------------------------------------------------------------------------------------------------
+// OPCODE NOTES
+// ============
+// GCN does not do UNORM or SNORM for bytes in opcodes.
+//  - V_CVT_F32_UBYTE{0,1,2,3} - Unsigned byte to float.
+//  - V_CVT_PKACC_U8_F32 - Float to unsigned byte (does bit-field insert into 32-bit integer).
+// V_PERM_B32 does byte packing with ability to zero fill bytes as well.
+//  - Can pull out byte values from two sources, and zero fill upper 8-bits of packed hi and lo. 
+//------------------------------------------------------------------------------------------------------------------------------
+// BYTE : FLOAT - ABuc{0,1,2,3}{To,From}U1() - Designed for V_CVT_F32_UBYTE* and V_CVT_PKACCUM_U8_F32 ops.
+// ====   =====
+//    0 : 0
+//    1 : 1
+//     ...
+//  255 : 255
+//      : 256 (just outside the encoding range)
+//------------------------------------------------------------------------------------------------------------------------------
+// BYTE : FLOAT - ABuc{0,1,2,3}{To,From}U2() - Designed for 16-bit denormal tricks and V_PERM_B32.
+// ====   =====
+//    0 : 0
+//    1 : 1/512
+//    2 : 1/256
+//     ...
+//   64 : 1/8
+//  128 : 1/4
+//  255 : 255/512
+//      : 1/2 (just outside the encoding range)
+//------------------------------------------------------------------------------------------------------------------------------
+// OPTIMAL IMPLEMENTATIONS ON AMD ARCHITECTURES
+// ============================================
+// r=ABuc0FromU1(i)
+//   V_CVT_F32_UBYTE0 r,i
+// --------------------------------------------
+// r=ABuc0ToU1(d,i)
+//   V_CVT_PKACCUM_U8_F32 r,i,0,d
+// --------------------------------------------
+// d=ABuc0FromU2(i)
+//   Where 'k0' is an SGPR with 0x0E0A
+//   Where 'k1' is an SGPR with {32768.0} packed into the lower 16-bits
+//   V_PERM_B32 d,i.x,i.y,k0
+//   V_PK_FMA_F16 d,d,k1.x,0
+// --------------------------------------------
+// r=ABuc0ToU2(d,i)
+//   Where 'k0' is an SGPR with {1.0/32768.0} packed into the lower 16-bits
+//   Where 'k1' is an SGPR with 0x????
+//   Where 'k2' is an SGPR with 0x????
+//   V_PK_FMA_F16 i,i,k0.x,0
+//   V_PERM_B32 r.x,i,i,k1
+//   V_PERM_B32 r.y,i,i,k2
+//------------------------------------------------------------------------------------------------------------------------------
+// TODO
+// ====
+//  - Make sure the compiler does the right thing.
+//  - Define float to byte conversion rules.
+//==============================================================================================================================
+ // Peak range for 32-bit and 16-bit operations.
+ #define A_BUC_32 (256.0)
+ #define A_BUC_16 (0.5)
+//==============================================================================================================================
+ #if 1
+  // Designed to be one V_CVT_PKACCUM_U8_F32.
+  // The extra min is required to pattern match to V_CVT_PKACCUM_U8_F32.
+  // TODO: Verify associated SWDEV-200428 JIRA has this fixed!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  AU1 ABuc0ToU1(AU1 d,AF1 i){return (d&0xffffff00u)|((min(AU1(i),255u)    )&(0x000000ffu));}
+  AU1 ABuc1ToU1(AU1 d,AF1 i){return (d&0xffff00ffu)|((min(AU1(i),255u)<< 8)&(0x0000ff00u));}
+  AU1 ABuc2ToU1(AU1 d,AF1 i){return (d&0xff00ffffu)|((min(AU1(i),255u)<<16)&(0x00ff0000u));}
+  AU1 ABuc3ToU1(AU1 d,AF1 i){return (d&0x00ffffffu)|((min(AU1(i),255u)<<24)&(0xff000000u));}
+//------------------------------------------------------------------------------------------------------------------------------
+  // Designed to be one V_CVT_F32_UBYTE*.
+  AF1 ABuc0FromU1(AU1 i){return AF1((i    )&255u);}
+  AF1 ABuc1FromU1(AU1 i){return AF1((i>> 8)&255u);}
+  AF1 ABuc2FromU1(AU1 i){return AF1((i>>16)&255u);}
+  AF1 ABuc3FromU1(AU1 i){return AF1((i>>24)&255u);}
+ #endif
+//==============================================================================================================================
+ #ifdef A_HALF
+  // Takes {x0,x1} and {y0,y1} and builds {{x0,y0},{x1,y1}}.
+  AW2 ABuc01ToW2(AH2 x,AH2 y){x*=AH2_(1.0/32768.0);y*=AH2_(1.0/32768.0);
+   return AW2_AU1(APermGCEA(AU2(AU1_AW2(AW2_AH2(x)),AU1_AW2(AW2_AH2(y)))));}
+//------------------------------------------------------------------------------------------------------------------------------
+  // Designed for 3 ops to do SOA to AOS and conversion.
+  AU2 ABuc0ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)));
+   return AU2(APermHGFA(AU2(d.x,b)),APermHGFC(AU2(d.y,b)));}
+  AU2 ABuc1ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)));
+   return AU2(APermHGAE(AU2(d.x,b)),APermHGCE(AU2(d.y,b)));}
+  AU2 ABuc2ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)));
+   return AU2(APermHAFE(AU2(d.x,b)),APermHCFE(AU2(d.y,b)));}
+  AU2 ABuc3ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)));
+   return AU2(APermAGFE(AU2(d.x,b)),APermCGFE(AU2(d.y,b)));}
+//------------------------------------------------------------------------------------------------------------------------------
+  // Designed for 2 ops to do both AOS to SOA, and conversion.
+  AH2 ABuc0FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0E0A(i)))*AH2_(32768.0);}
+  AH2 ABuc1FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0F0B(i)))*AH2_(32768.0);}
+  AH2 ABuc2FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0G0C(i)))*AH2_(32768.0);}
+  AH2 ABuc3FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0H0D(i)))*AH2_(32768.0);}
+ #endif
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                 [BSC] BYTE SIGNED CONVERSION
+//------------------------------------------------------------------------------------------------------------------------------
+// Similar to [BUC].
+//------------------------------------------------------------------------------------------------------------------------------
+// ENCODING (without zero-based encoding)
+// ========
+//   0 = unused (can be used to mean something else)
+//   1 = lowest value 
+// 128 = exact zero center (zero based encoding 
+// 255 = highest value
+//------------------------------------------------------------------------------------------------------------------------------
+// Zero-based [Zb] flips the MSB bit of the byte (making 128 "exact zero" actually zero).
+// This is useful if there is a desire for cleared values to decode as zero.
+//------------------------------------------------------------------------------------------------------------------------------
+// BYTE : FLOAT - ABsc{0,1,2,3}{To,From}U2() - Designed for 16-bit denormal tricks and V_PERM_B32.
+// ====   =====
+//    0 : -127/512 (unused)
+//    1 : -126/512
+//    2 : -125/512
+//     ...
+//  128 : 0 
+//     ... 
+//  255 : 127/512
+//      : 1/4 (just outside the encoding range)
+//------------------------------------------------------------------------------------------------------------------------------
+// TODO
+// ====
+//  - Make sure the compiler does the right thing.
+//  - Define float to byte conversion rules.
+//==============================================================================================================================
+ // Peak range for 32-bit and 16-bit operations.
+ #define A_BSC_32 (128.0)
+ #define A_BSC_16 (0.25)
+//==============================================================================================================================
+ #if 1
+  // TODO: Find why trunc() was needed, and fix BUC as well!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  AU1 ABsc0ToU1(AU1 d,AF1 i){return (d&0xffffff00u)|((AU1(trunc(i)+128.0)    )&(0x000000ffu));}
+  AU1 ABsc1ToU1(AU1 d,AF1 i){return (d&0xffff00ffu)|((AU1(trunc(i)+128.0)<< 8)&(0x0000ff00u));}
+  AU1 ABsc2ToU1(AU1 d,AF1 i){return (d&0xff00ffffu)|((AU1(trunc(i)+128.0)<<16)&(0x00ff0000u));}
+  AU1 ABsc3ToU1(AU1 d,AF1 i){return (d&0x00ffffffu)|((AU1(trunc(i)+128.0)<<24)&(0xff000000u));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AU1 ABsc0ToZbU1(AU1 d,AF1 i){return ((d&0xffffff00u)|((AU1(trunc(i)+128.0)    )&(0x000000ffu)))^0x00000080u;}
+  AU1 ABsc1ToZbU1(AU1 d,AF1 i){return ((d&0xffff00ffu)|((AU1(trunc(i)+128.0)<< 8)&(0x0000ff00u)))^0x00008000u;}
+  AU1 ABsc2ToZbU1(AU1 d,AF1 i){return ((d&0xff00ffffu)|((AU1(trunc(i)+128.0)<<16)&(0x00ff0000u)))^0x00800000u;}
+  AU1 ABsc3ToZbU1(AU1 d,AF1 i){return ((d&0x00ffffffu)|((AU1(trunc(i)+128.0)<<24)&(0xff000000u)))^0x80000000u;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AF1 ABsc0FromU1(AU1 i){return AF1((i    )&255u)-128.0;}
+  AF1 ABsc1FromU1(AU1 i){return AF1((i>> 8)&255u)-128.0;}
+  AF1 ABsc2FromU1(AU1 i){return AF1((i>>16)&255u)-128.0;}
+  AF1 ABsc3FromU1(AU1 i){return AF1((i>>24)&255u)-128.0;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AF1 ABsc0FromZbU1(AU1 i){return AF1(((i^0x00000080u)    )&255u)-128.0;}
+  AF1 ABsc1FromZbU1(AU1 i){return AF1(((i^0x00008000u)>> 8)&255u)-128.0;}
+  AF1 ABsc2FromZbU1(AU1 i){return AF1(((i^0x00800000u)>>16)&255u)-128.0;}
+  AF1 ABsc3FromZbU1(AU1 i){return AF1(((i^0x80000000u)>>24)&255u)-128.0;}
+ #endif
+//==============================================================================================================================
+ #ifdef A_HALF
+  // Takes {x0,x1} and {y0,y1} and builds {{x0,y0},{x1,y1}}.
+  AW2 ABsc01ToW2(AH2 x,AH2 y){x=x*AH2_(1.0/32768.0)+AH2_(0.25/32768.0);y=y*AH2_(1.0/32768.0)+AH2_(0.25/32768.0);
+   return AW2_AU1(APermGCEA(AU2(AU1_AW2(AW2_AH2(x)),AU1_AW2(AW2_AH2(y)))));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AU2 ABsc0ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)));
+   return AU2(APermHGFA(AU2(d.x,b)),APermHGFC(AU2(d.y,b)));}
+  AU2 ABsc1ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)));
+   return AU2(APermHGAE(AU2(d.x,b)),APermHGCE(AU2(d.y,b)));}
+  AU2 ABsc2ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)));
+   return AU2(APermHAFE(AU2(d.x,b)),APermHCFE(AU2(d.y,b)));}
+  AU2 ABsc3ToU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)));
+   return AU2(APermAGFE(AU2(d.x,b)),APermCGFE(AU2(d.y,b)));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AU2 ABsc0ToZbU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)))^0x00800080u;
+   return AU2(APermHGFA(AU2(d.x,b)),APermHGFC(AU2(d.y,b)));}
+  AU2 ABsc1ToZbU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)))^0x00800080u;
+   return AU2(APermHGAE(AU2(d.x,b)),APermHGCE(AU2(d.y,b)));}
+  AU2 ABsc2ToZbU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)))^0x00800080u;
+   return AU2(APermHAFE(AU2(d.x,b)),APermHCFE(AU2(d.y,b)));}
+  AU2 ABsc3ToZbU2(AU2 d,AH2 i){AU1 b=AU1_AW2(AW2_AH2(i*AH2_(1.0/32768.0)+AH2_(0.25/32768.0)))^0x00800080u;
+   return AU2(APermAGFE(AU2(d.x,b)),APermCGFE(AU2(d.y,b)));}
+//------------------------------------------------------------------------------------------------------------------------------
+  AH2 ABsc0FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0E0A(i)))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc1FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0F0B(i)))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc2FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0G0C(i)))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc3FromU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0H0D(i)))*AH2_(32768.0)-AH2_(0.25);}
+//------------------------------------------------------------------------------------------------------------------------------
+  AH2 ABsc0FromZbU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0E0A(i)^0x00800080u))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc1FromZbU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0F0B(i)^0x00800080u))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc2FromZbU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0G0C(i)^0x00800080u))*AH2_(32768.0)-AH2_(0.25);}
+  AH2 ABsc3FromZbU2(AU2 i){return AH2_AW2(AW2_AU1(APerm0H0D(i)^0x00800080u))*AH2_(32768.0)-AH2_(0.25);}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -987,6 +1809,11 @@
  AF1 APrxLoRcpF1(AF1 a){return AF1_AU1(AU1_(0x7ef07ebb)-AU1_AF1(a));}
  AF1 APrxMedRcpF1(AF1 a){AF1 b=AF1_AU1(AU1_(0x7ef19fff)-AU1_AF1(a));return b*(-b*a+AF1_(2.0));}
  AF1 APrxLoRsqF1(AF1 a){return AF1_AU1(AU1_(0x5f347d74)-(AU1_AF1(a)>>AU1_(1)));}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 APrxLoSqrtF2(AF2 a){return AF2_AU2((AU2_AF2(a)>>AU2_(1))+AU2_(0x1fbc4639));}
+ AF2 APrxLoRcpF2(AF2 a){return AF2_AU2(AU2_(0x7ef07ebb)-AU2_AF2(a));}
+ AF2 APrxMedRcpF2(AF2 a){AF2 b=AF2_AU2(AU2_(0x7ef19fff)-AU2_AF2(a));return b*(-b*a+AF2_(2.0));}
+ AF2 APrxLoRsqF2(AF2 a){return AF2_AU2(AU2_(0x5f347d74)-(AU2_AF2(a)>>AU2_(1)));}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //_____________________________________________________________/\_______________________________________________________________
@@ -999,17 +1826,25 @@
 // ====
 //  - Verify packed math ABS is correctly doing an AND.
 //==============================================================================================================================
- // Valid input range is {-1 to 1} representing {0 to 2 pi}.
- // Output range is {-1/4 to -1/4} representing {-1 to 1}.
- AF1 APSinF1(AF1 x){return x*abs(x)-x;} // MAD.
- AF1 APCosF1(AF1 x){x=AFractF1(x*AF1_(0.5)+AF1_(0.75));x=x*AF1_(2.0)-AF1_(1.0);return APSinF1(x);} // 3x MAD, FRACT 
+ #if 1
+  // Valid input range is {-1 to 1} representing {0 to 2 pi}.
+  // Output range is {-1/4 to -1/4} representing {-1 to 1}.
+  AF1 APSinF1(AF1 x){return x*abs(x)-x;} // MAD.
+  AF2 APSinF2(AF2 x){return x*abs(x)-x;}
+  AF1 APCosF1(AF1 x){x=AFractF1(x*AF1_(0.5)+AF1_(0.75));x=x*AF1_(2.0)-AF1_(1.0);return APSinF1(x);} // 3x MAD, FRACT
+  AF2 APCosF2(AF2 x){x=AFractF2(x*AF2_(0.5)+AF2_(0.75));x=x*AF2_(2.0)-AF2_(1.0);return APSinF2(x);}
+  AF2 APSinCosF1(AF1 x){AF1 y=AFractF1(x*AF1_(0.5)+AF1_(0.75));y=y*AF1_(2.0)-AF1_(1.0);return APSinF2(AF2(x,y));}
+ #endif
 //------------------------------------------------------------------------------------------------------------------------------
  #ifdef A_HALF
   // For a packed {sin,cos} pair,
   //  - Native takes 16 clocks and 4 issue slots (no packed transcendentals).
   //  - Parabolic takes 8 clocks and 8 issue slots (only fract is non-packed).
+  AH1 APSinH1(AH1 x){return x*abs(x)-x;}
   AH2 APSinH2(AH2 x){return x*abs(x)-x;} // AND,FMA
-  AH2 APCosH2(AH2 x){x=AFractH2(x*AH2_(0.5)+AH2_(0.75));x=x*AH2_(2.0)-AH2_(1.0);return APSinH2(x);} // 3x FMA, 2xFRACT, AND 
+  AH1 APCosH1(AH1 x){x=AFractH1(x*AH1_(0.5)+AH1_(0.75));x=x*AH1_(2.0)-AH1_(1.0);return APSinH1(x);} 
+  AH2 APCosH2(AH2 x){x=AFractH2(x*AH2_(0.5)+AH2_(0.75));x=x*AH2_(2.0)-AH2_(1.0);return APSinH2(x);} // 3x FMA, 2xFRACT, AND
+  AH2 APSinCosH1(AH1 x){AH1 y=AFractH1(x*AH1_(0.5)+AH1_(0.75));y=y*AH1_(2.0)-AH1_(1.0);return APSinH2(AH2(x,y));}
  #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1124,6 +1959,11 @@
  //  24 25 2c 2d 34 35 3c 3d
  //  26 27 2e 2f 36 37 3e 3f 
  AU2 ARmpRed8x8(AU1 a){return AU2(ABfiM(ABfe(a,2u,3u),a,1u),ABfiM(ABfe(a,3u,3u),ABfe(a,1u,2u),2u));}
+//==============================================================================================================================
+ #ifdef A_HALF
+  AW2 ARmp8x8H(AU1 a){return AW2(ABfe(a,1u,3u),ABfiM(ABfe(a,3u,3u),a,1u));}
+  AW2 ARmpRed8x8H(AU1 a){return AW2(ABfiM(ABfe(a,2u,3u),a,1u),ABfiM(ABfe(a,3u,3u),ABfe(a,1u,2u),2u));}
+ #endif
 #endif
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1178,8 +2018,278 @@
 // Scaling limits,
 //  2^15 = 32768 ...................................... largest power of 2 scaling
 // Largest pow2 conversion mapping is at *32768,
-//     1 : 2^(-9) = 1/128
-//  1024 : 8
-//  2047 : a little less than 16
+//     1 : 2^(-9) = 1/512
+//     2 : 1/256
+//     4 : 1/128
+//     8 : 1/64
+//    16 : 1/32
+//    32 : 1/16
+//    64 : 1/8
+//   128 : 1/4
+//   256 : 1/2
+//   512 : 1
+//  1024 : 2
+//  2047 : a little less than 4
 //==============================================================================================================================
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//
+//
+//                                                     GPU/CPU PORTABILITY
+//
+//
+//------------------------------------------------------------------------------------------------------------------------------
+// This is the GPU implementation.
+// See the CPU implementation for docs.
+//==============================================================================================================================
+#ifdef A_GPU
+ #define A_TRUE true
+ #define A_FALSE false
+ #define A_STATIC
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                     VECTOR ARGUMENT/RETURN/INITIALIZATION PORTABILITY
+//==============================================================================================================================
+ #define retAD2 AD2
+ #define retAD3 AD3
+ #define retAD4 AD4
+ #define retAF2 AF2
+ #define retAF3 AF3
+ #define retAF4 AF4
+ #define retAL2 AL2
+ #define retAL3 AL3
+ #define retAL4 AL4
+ #define retAU2 AU2
+ #define retAU3 AU3
+ #define retAU4 AU4
+//------------------------------------------------------------------------------------------------------------------------------
+ #define inAD2 in AD2
+ #define inAD3 in AD3
+ #define inAD4 in AD4
+ #define inAF2 in AF2
+ #define inAF3 in AF3
+ #define inAF4 in AF4
+ #define inAL2 in AL2
+ #define inAL3 in AL3
+ #define inAL4 in AL4
+ #define inAU2 in AU2
+ #define inAU3 in AU3
+ #define inAU4 in AU4
+//------------------------------------------------------------------------------------------------------------------------------
+ #define inoutAD2 inout AD2
+ #define inoutAD3 inout AD3
+ #define inoutAD4 inout AD4
+ #define inoutAF2 inout AF2
+ #define inoutAF3 inout AF3
+ #define inoutAF4 inout AF4
+ #define inoutAL2 inout AL2
+ #define inoutAL3 inout AL3
+ #define inoutAL4 inout AL4
+ #define inoutAU2 inout AU2
+ #define inoutAU3 inout AU3
+ #define inoutAU4 inout AU4
+//------------------------------------------------------------------------------------------------------------------------------
+ #define outAD2 out AD2
+ #define outAD3 out AD3
+ #define outAD4 out AD4
+ #define outAF2 out AF2
+ #define outAF3 out AF3
+ #define outAF4 out AF4
+ #define outAL2 out AL2
+ #define outAL3 out AL3
+ #define outAL4 out AL4
+ #define outAU2 out AU2
+ #define outAU3 out AU3
+ #define outAU4 out AU4
+//------------------------------------------------------------------------------------------------------------------------------
+ #define varAD2(x) AD2 x
+ #define varAD3(x) AD3 x
+ #define varAD4(x) AD4 x
+ #define varAF2(x) AF2 x
+ #define varAF3(x) AF3 x
+ #define varAF4(x) AF4 x
+ #define varAL2(x) AL2 x
+ #define varAL3(x) AL3 x
+ #define varAL4(x) AL4 x
+ #define varAU2(x) AU2 x
+ #define varAU3(x) AU3 x
+ #define varAU4(x) AU4 x
+//------------------------------------------------------------------------------------------------------------------------------
+ #define initAD2(x,y) AD2(x,y)
+ #define initAD3(x,y,z) AD3(x,y,z)
+ #define initAD4(x,y,z,w) AD4(x,y,z,w)
+ #define initAF2(x,y) AF2(x,y)
+ #define initAF3(x,y,z) AF3(x,y,z)
+ #define initAF4(x,y,z,w) AF4(x,y,z,w)
+ #define initAL2(x,y) AL2(x,y)
+ #define initAL3(x,y,z) AL3(x,y,z)
+ #define initAL4(x,y,z,w) AL4(x,y,z,w)
+ #define initAU2(x,y) AU2(x,y)
+ #define initAU3(x,y,z) AU3(x,y,z)
+ #define initAU4(x,y,z,w) AU4(x,y,z,w)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                     SCALAR RETURN OPS
+//==============================================================================================================================
+ #define AAbsD1(a) abs(AD1(a))
+ #define AAbsF1(a) abs(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define ACosD1(a) cos(AD1(a))
+ #define ACosF1(a) cos(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define ADotD2(a,b) dot(AD2(a),AD2(b))
+ #define ADotD3(a,b) dot(AD3(a),AD3(b))
+ #define ADotD4(a,b) dot(AD4(a),AD4(b))
+ #define ADotF2(a,b) dot(AF2(a),AF2(b))
+ #define ADotF3(a,b) dot(AF3(a),AF3(b))
+ #define ADotF4(a,b) dot(AF4(a),AF4(b))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define AExp2D1(a) exp2(AD1(a))
+ #define AExp2F1(a) exp2(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define AFloorD1(a) floor(AD1(a))
+ #define AFloorF1(a) floor(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define ALog2D1(a) log2(AD1(a))
+ #define ALog2F1(a) log2(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define AMaxD1(a,b) max(a,b)
+ #define AMaxF1(a,b) max(a,b)
+ #define AMaxL1(a,b) max(a,b)
+ #define AMaxU1(a,b) max(a,b)
+//------------------------------------------------------------------------------------------------------------------------------
+ #define AMinD1(a,b) min(a,b)
+ #define AMinF1(a,b) min(a,b)
+ #define AMinL1(a,b) min(a,b)
+ #define AMinU1(a,b) min(a,b)
+//------------------------------------------------------------------------------------------------------------------------------
+ #define ASinD1(a) sin(AD1(a))
+ #define ASinF1(a) sin(AF1(a))
+//------------------------------------------------------------------------------------------------------------------------------
+ #define ASqrtD1(a) sqrt(AD1(a))
+ #define ASqrtF1(a) sqrt(AF1(a))
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                               SCALAR RETURN OPS - DEPENDENT
+//==============================================================================================================================
+ #define APowD1(a,b) pow(AD1(a),AF1(b))
+ #define APowF1(a,b) pow(AF1(a),AF1(b))
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//_____________________________________________________________/\_______________________________________________________________
+//==============================================================================================================================
+//                                                         VECTOR OPS
+//------------------------------------------------------------------------------------------------------------------------------
+// These are added as needed for production or prototyping, so not necessarily a complete set.
+// They follow a convention of taking in a destination and also returning the destination value to increase utility.
+//==============================================================================================================================
+ #ifdef A_DUBL
+  AD2 opAAbsD2(outAD2 d,inAD2 a){d=abs(a);return d;}
+  AD3 opAAbsD3(outAD3 d,inAD3 a){d=abs(a);return d;}
+  AD4 opAAbsD4(outAD4 d,inAD4 a){d=abs(a);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAAddD2(outAD2 d,inAD2 a,inAD2 b){d=a+b;return d;}
+  AD3 opAAddD3(outAD3 d,inAD3 a,inAD3 b){d=a+b;return d;}
+  AD4 opAAddD4(outAD4 d,inAD4 a,inAD4 b){d=a+b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAAddOneD2(outAD2 d,inAD2 a,AD1 b){d=a+AD2_(b);return d;}
+  AD3 opAAddOneD3(outAD3 d,inAD3 a,AD1 b){d=a+AD3_(b);return d;}
+  AD4 opAAddOneD4(outAD4 d,inAD4 a,AD1 b){d=a+AD4_(b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opACpyD2(outAD2 d,inAD2 a){d=a;return d;}
+  AD3 opACpyD3(outAD3 d,inAD3 a){d=a;return d;}
+  AD4 opACpyD4(outAD4 d,inAD4 a){d=a;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opALerpD2(outAD2 d,inAD2 a,inAD2 b,inAD2 c){d=ALerpD2(a,b,c);return d;}
+  AD3 opALerpD3(outAD3 d,inAD3 a,inAD3 b,inAD3 c){d=ALerpD3(a,b,c);return d;}
+  AD4 opALerpD4(outAD4 d,inAD4 a,inAD4 b,inAD4 c){d=ALerpD4(a,b,c);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opALerpOneD2(outAD2 d,inAD2 a,inAD2 b,AD1 c){d=ALerpD2(a,b,AD2_(c));return d;}
+  AD3 opALerpOneD3(outAD3 d,inAD3 a,inAD3 b,AD1 c){d=ALerpD3(a,b,AD3_(c));return d;}
+  AD4 opALerpOneD4(outAD4 d,inAD4 a,inAD4 b,AD1 c){d=ALerpD4(a,b,AD4_(c));return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAMaxD2(outAD2 d,inAD2 a,inAD2 b){d=max(a,b);return d;}
+  AD3 opAMaxD3(outAD3 d,inAD3 a,inAD3 b){d=max(a,b);return d;}
+  AD4 opAMaxD4(outAD4 d,inAD4 a,inAD4 b){d=max(a,b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAMinD2(outAD2 d,inAD2 a,inAD2 b){d=min(a,b);return d;}
+  AD3 opAMinD3(outAD3 d,inAD3 a,inAD3 b){d=min(a,b);return d;}
+  AD4 opAMinD4(outAD4 d,inAD4 a,inAD4 b){d=min(a,b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAMulD2(outAD2 d,inAD2 a,inAD2 b){d=a*b;return d;}
+  AD3 opAMulD3(outAD3 d,inAD3 a,inAD3 b){d=a*b;return d;}
+  AD4 opAMulD4(outAD4 d,inAD4 a,inAD4 b){d=a*b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opAMulOneD2(outAD2 d,inAD2 a,AD1 b){d=a*AD2_(b);return d;}
+  AD3 opAMulOneD3(outAD3 d,inAD3 a,AD1 b){d=a*AD3_(b);return d;}
+  AD4 opAMulOneD4(outAD4 d,inAD4 a,AD1 b){d=a*AD4_(b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opANegD2(outAD2 d,inAD2 a){d=-a;return d;}
+  AD3 opANegD3(outAD3 d,inAD3 a){d=-a;return d;}
+  AD4 opANegD4(outAD4 d,inAD4 a){d=-a;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+  AD2 opARcpD2(outAD2 d,inAD2 a){d=ARcpD2(a);return d;}
+  AD3 opARcpD3(outAD3 d,inAD3 a){d=ARcpD3(a);return d;}
+  AD4 opARcpD4(outAD4 d,inAD4 a){d=ARcpD4(a);return d;}
+ #endif
+//==============================================================================================================================
+ AF2 opAAbsF2(outAF2 d,inAF2 a){d=abs(a);return d;}
+ AF3 opAAbsF3(outAF3 d,inAF3 a){d=abs(a);return d;}
+ AF4 opAAbsF4(outAF4 d,inAF4 a){d=abs(a);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAAddF2(outAF2 d,inAF2 a,inAF2 b){d=a+b;return d;}
+ AF3 opAAddF3(outAF3 d,inAF3 a,inAF3 b){d=a+b;return d;}
+ AF4 opAAddF4(outAF4 d,inAF4 a,inAF4 b){d=a+b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAAddOneF2(outAF2 d,inAF2 a,AF1 b){d=a+AF2_(b);return d;}
+ AF3 opAAddOneF3(outAF3 d,inAF3 a,AF1 b){d=a+AF3_(b);return d;}
+ AF4 opAAddOneF4(outAF4 d,inAF4 a,AF1 b){d=a+AF4_(b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opACpyF2(outAF2 d,inAF2 a){d=a;return d;}
+ AF3 opACpyF3(outAF3 d,inAF3 a){d=a;return d;}
+ AF4 opACpyF4(outAF4 d,inAF4 a){d=a;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opALerpF2(outAF2 d,inAF2 a,inAF2 b,inAF2 c){d=ALerpF2(a,b,c);return d;}
+ AF3 opALerpF3(outAF3 d,inAF3 a,inAF3 b,inAF3 c){d=ALerpF3(a,b,c);return d;}
+ AF4 opALerpF4(outAF4 d,inAF4 a,inAF4 b,inAF4 c){d=ALerpF4(a,b,c);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opALerpOneF2(outAF2 d,inAF2 a,inAF2 b,AF1 c){d=ALerpF2(a,b,AF2_(c));return d;}
+ AF3 opALerpOneF3(outAF3 d,inAF3 a,inAF3 b,AF1 c){d=ALerpF3(a,b,AF3_(c));return d;}
+ AF4 opALerpOneF4(outAF4 d,inAF4 a,inAF4 b,AF1 c){d=ALerpF4(a,b,AF4_(c));return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAMaxF2(outAF2 d,inAF2 a,inAF2 b){d=max(a,b);return d;}
+ AF3 opAMaxF3(outAF3 d,inAF3 a,inAF3 b){d=max(a,b);return d;}
+ AF4 opAMaxF4(outAF4 d,inAF4 a,inAF4 b){d=max(a,b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAMinF2(outAF2 d,inAF2 a,inAF2 b){d=min(a,b);return d;}
+ AF3 opAMinF3(outAF3 d,inAF3 a,inAF3 b){d=min(a,b);return d;}
+ AF4 opAMinF4(outAF4 d,inAF4 a,inAF4 b){d=min(a,b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAMulF2(outAF2 d,inAF2 a,inAF2 b){d=a*b;return d;}
+ AF3 opAMulF3(outAF3 d,inAF3 a,inAF3 b){d=a*b;return d;}
+ AF4 opAMulF4(outAF4 d,inAF4 a,inAF4 b){d=a*b;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opAMulOneF2(outAF2 d,inAF2 a,AF1 b){d=a*AF2_(b);return d;}
+ AF3 opAMulOneF3(outAF3 d,inAF3 a,AF1 b){d=a*AF3_(b);return d;}
+ AF4 opAMulOneF4(outAF4 d,inAF4 a,AF1 b){d=a*AF4_(b);return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opANegF2(outAF2 d,inAF2 a){d=-a;return d;}
+ AF3 opANegF3(outAF3 d,inAF3 a){d=-a;return d;}
+ AF4 opANegF4(outAF4 d,inAF4 a){d=-a;return d;}
+//------------------------------------------------------------------------------------------------------------------------------
+ AF2 opARcpF2(outAF2 d,inAF2 a){d=ARcpF2(a);return d;}
+ AF3 opARcpF3(outAF3 d,inAF3 a){d=ARcpF3(a);return d;}
+ AF4 opARcpF4(outAF4 d,inAF4 a){d=ARcpF4(a);return d;}
+#endif

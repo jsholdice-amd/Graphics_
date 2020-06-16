@@ -49,6 +49,8 @@ namespace UnityEngine.Rendering.HighDefinition
 
         //  AMD-CAS data
         ComputeBuffer m_ContrastAdaptiveSharpen;
+        // AMD-CPF Data
+        ComputeBuffer m_CinematicPostFilter;
 
         // Bloom data
         const int k_MaxBloomMipCount = 16;
@@ -280,6 +282,7 @@ namespace UnityEngine.Rendering.HighDefinition
             CoreUtils.SafeRelease(m_NearBokehTileList);
             CoreUtils.SafeRelease(m_FarBokehTileList);
             CoreUtils.SafeRelease(m_ContrastAdaptiveSharpen);
+            CoreUtils.SafeRelease(m_CinematicPostFilter);
 
             m_EmptyExposureTexture      = null;
             m_TempTexture1024           = null;
@@ -529,6 +532,15 @@ namespace UnityEngine.Rendering.HighDefinition
                             {
                                 var destination = m_Pool.Get(Vector2.one, m_ColorFormat);
                                 DoSMAA(cmd, camera, source, destination, depthBuffer);
+                                PoolSource(ref source, destination);
+                            }
+                        } 
+                        else if (camera.antialiasing == AntialiasingMode.CinematicPostFilter)
+                        {
+                            using (new ProfilingScope(cmd, ProfilingSampler.Get(HDProfileId.CinematicPostFilter)))
+                            {
+                                var destination = m_Pool.Get(Vector2.one, m_ColorFormat);
+                                DoCinematicPostFilter(cmd, camera, source, destination, depthBuffer);
                                 PoolSource(ref source, destination);
                             }
                         }
@@ -996,6 +1008,48 @@ namespace UnityEngine.Rendering.HighDefinition
             next = camera.GetCurrentFrameRT((int)HDCameraFrameHistoryType.TemporalAntialiasing)
                 ?? camera.AllocHistoryFrameRT((int)HDCameraFrameHistoryType.TemporalAntialiasing, Allocator, 2);
             previous = camera.GetPreviousFrameRT((int)HDCameraFrameHistoryType.TemporalAntialiasing);
+        }
+
+        void DoCinematicPostFilter(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination, RTHandle depthBuffer)
+        {
+            // Fidelity FX Cinematic Post filter, TAA
+
+            var cs = m_Resources.shaders.cinematicPostFilterCS;
+            int cpfPre = cs.FindKernel("CpfPreU");
+            int cpfRec = cs.FindKernel("CpfRecU");
+            int cpfCln = cs.FindKernel("CpfClnU");
+
+            if (cpfPre >= 0 && cpfRec >= 0 && cpfCln >= 0) {
+                // destination set earlier
+                cmd.SetComputeVectorParam(cs, HDShaderIDs._InputTextureDimensions, new Vector4(source.rt.width,source.rt.height));
+                cmd.SetComputeVectorParam(cs, HDShaderIDs._OutputTextureDimensions, new Vector4(destination.rt.width, destination.rt.height));
+
+                // Set textures for cpf kernels
+                // Input texture
+                cmd.SetComputeTextureParam(cs, cpfPre, HDShaderIDs._InputTexture, source);
+                cmd.SetComputeTextureParam(cs, cpfRec, HDShaderIDs._InputTexture, source);
+                cmd.SetComputeTextureParam(cs, cpfCln, HDShaderIDs._InputTexture, source);
+
+                // Compute buffer
+                ValidateComputeBuffer(ref m_CinematicPostFilter, 32, sizeof(uint) * 4);
+
+                cmd.SetComputeBufferParam(cs, cpfPre, "CpfParameters", m_CinematicPostFilter);
+                cmd.SetComputeBufferParam(cs, cpfRec, "CpfParameters", m_CinematicPostFilter);
+                cmd.SetComputeBufferParam(cs, cpfCln, "CpfParameters", m_CinematicPostFilter);
+
+                // Output texture
+                cmd.SetComputeTextureParam(cs, cpfPre,HDShaderIDs._OutputTexture, destination);
+                cmd.SetComputeTextureParam(cs, cpfRec,HDShaderIDs._OutputTexture, destination);
+                cmd.SetComputeTextureParam(cs, cpfCln,HDShaderIDs._OutputTexture, destination);
+                  
+                // frame counter ?
+
+                // 3 passes of compute
+                // Run as 64x1x1, shader remaps to 8x8
+                cmd.DispatchCompute(cs, cpfPre,64,1,1);
+                cmd.DispatchCompute(cs, cpfRec,64,1,1);
+                cmd.DispatchCompute(cs, cpfCln,64,1,1);
+            }
         }
 
         #endregion

@@ -219,8 +219,10 @@ namespace UnityEngine.Rendering.HighDefinition
             FastApproximateAntialiasing,
             /// <summary>Temporal anti-aliasing.</summary>
             TemporalAntialiasing,
+            /// <summary>Cinematic Post Filter.</summary>
+            CinematicPostFilter,
             /// <summary>SMAA.</summary>
-            SubpixelMorphologicalAntiAliasing
+            SubpixelMorphologicalAntiAliasing,
         }
 
         /// <summary>

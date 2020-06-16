@@ -1,0 +1,212 @@
+#pragma kernel CpfPreU
+#pragma kernel CpfRecU
+#pragma kernel CpfClnU
+
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
+
+#define A_GPU 1
+#define A_HLSL 1
+
+//#define CPF_DFU 1 // Leave undefined for excluding diffusion
+//#define CPF_NOZ 1 // Leave undefined for excluding noise reduction
+
+#define CPF_32BIT 1
+
+#include "ffx_a.h"
+
+RWStructuredBuffer<uint4> CpfParameters; //size 32
+
+AF2 InputTextureDimensions;
+AF2 OutputTextureDimensions;
+
+// Textures from Unity, In/Out
+TEXTURE2D_X(_InputTexture);
+RW_TEXTURE2D_X(float4, _OutputTexture);
+
+// Textures that stay in gpu space
+//      TexColorCoC[2]      RGBA8
+//      TexPackedMotion[2]  R16UI
+RW_TEXTURE2D_X(float4, TexColorCoC0);
+RW_TEXTURE2D_X(float4, TexColorCoC1);
+RW_TEXTURE2D_X(float4, TexPackedMotion0);
+RW_TEXTURE2D_X(float4, TexPackedMotion1);
+
+SAMPLER(sampler_LinearClamp);
+
+// Control block: RGBA32UI[32].
+// The CPF Parameters get stored in here. Storage and retrieval is implementation specific.
+A_STATIC void CpfPut(AU1 i, AU4 v) {
+    CpfParameters[i] = v;
+}
+
+A_STATIC AU4 CpfGet(AU1 i) {
+    return CpfParameters[i];
+}
+
+//  // Cleaner input: {width,height} RGBA16F.
+//   AF4 CpfClnLd(AU2 p){return imageLoad(imgS_2D_RGBA16F[IMG_CLN],ASU2(p));} reduced color blur?
+//   void CpfClnSt(AU2 p,AF4 v){imageStore(imgS_2D_RGBA16F[IMG_CLN],ASU2(p),v);} final output?
+AF4 CpfClnLd(AU2 p)
+{
+    return _InputTexture[COORD_TEXTURE2D_X(p)];
+}
+void CpfClnSt(AU2 p,AF4 v)
+{
+    _OutputTexture[COORD_TEXTURE2D_X(p)] = v;
+}
+
+//  // Motion vector: {width,height} R16UI.
+//   AU1 CpfMovLd(AU1 b,AU2 p){return imageLoad(imgS_2D_R16UI[IMG_MOV0+b],ASU2(p)).x;}
+//   void CpfMovSt(AU1 b,AU2 p,AU1 v){imageStore(imgS_2D_R16UI[IMG_MOV0+b],ASU2(p),AU4(v,0,0,0));}
+//   // This is setup with a bilinear sampler.
+//   AU4 CpfMov4R(AU1 b,AF2 p){return textureGather(usampler2D(texS_2D_U[IMG_MOV0+b],sam[1]),p,0);}
+AU1 CpfMovLd(AU1 b, AU2 p) {
+    //return TexPackedMotion[AU3(b,p)].x;
+
+    return (b==0) // Not using texture array, just check which texture to use
+        ? TexPackedMotion0[COORD_TEXTURE2D_X(p)].x
+        : TexPackedMotion1[COORD_TEXTURE2D_X(p)].x;
+}
+
+void CpfMovSt(AU1 b, AU2 p, AU1 v) {
+    //TexPackedMotion[AU3(b,p)] = AF4(v,0,0,0);
+
+    if (b == 0) { // Not using texture array, just check which texture to use
+        TexPackedMotion0[COORD_TEXTURE2D_X(p)] = v;
+    } else {
+        TexPackedMotion1[COORD_TEXTURE2D_X(p)] = v;
+    }
+}
+
+AU4 CpfMov4R(AU1 b,AF2 p){
+
+    AU1 s = b == 0;
+
+    s = (b == 0) // Not using texture array, just check which texture to use
+        ? LOAD_TEXTURE2D_X(TexPackedMotion0, p).r
+        : LOAD_TEXTURE2D_X(TexPackedMotion1, p).r;
+
+    return AU4(s, 0, 0, 0);
+}
+
+//  // Color: {width,height} RGBA8
+//   AF4 CpfColLd(AU1 b,AU2 p){return imageLoad(imgS_2D_RGBA8[IMG_COL0+b],ASU2(p));} m_TexColorCoC?
+//   void CpfColSt(AU1 b,AU2 p,AF4 v){imageStore(imgS_2D_RGBA8[IMG_COL0+b],ASU2(p),v);}
+
+AF4 CpfColLd(AU1 b, AU2 p) {
+    //return TexColorCoC[COORD_TEXTURE2D_X(p)];
+
+    return (b==0) // Not using texture array, just check which texture to use
+        ? TexColorCoC0[COORD_TEXTURE2D_X(p)].x
+        : TexColorCoC1[COORD_TEXTURE2D_X(p)].x;
+}
+
+void CpfColSt(AU1 b, AU2 p, AF4 v) {
+    //TexColorCoC[COORD_TEXTURE2D_X(p)] = v;
+
+    if (b == 0) { // Not using texture array, just check which texture to use
+        TexColorCoC0[COORD_TEXTURE2D_X(p)] = v;
+    } else {
+        TexColorCoC1[COORD_TEXTURE2D_X(p)] = v;
+    }
+}
+
+AF4 CpfColSm(AU1 b,AF2 p){
+
+    if (b == 0) { // Not using texture array, just check which texture to use
+        return LOAD_TEXTURE2D_X(TexColorCoC0, p);
+    } else {
+        return LOAD_TEXTURE2D_X(TexColorCoC1, p);
+    }
+}
+AF4 CpfCol4A(AU1 b,AF2 p){
+    // Essentially a gather red
+    if (b == 0) { // Not using texture array, just check which texture to use
+        float4 output;
+        output.x = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,1)).r;
+        output.y = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,1)).r;
+        output.z = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,0)).r;
+        output.w = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,0)).r;
+        return output;
+    } else {
+        float4 output;
+        output.x = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,1)).r;
+        output.y = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,1)).r;
+        output.z = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,0)).r;
+        output.w = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,0)).r;
+        return output;
+    }
+}
+
+#include "ffx_cpf.h"
+
+// Pre
+//      In      srcTex_Color                    _InputTexture
+//      In      srcTex_Depth                    _CameraDepthTexture
+//      In      srcTex_MotionVector             _CameraMotionVectorsTexture
+//      Out     m_TexColorCoC[2]                RGBA8   TexColorCoC
+//      Out     m_TexPackedMotion[2]            R16UI   TexPackedMotion
+
+// Rec
+//      In      tex_ColorCoC                    from Pre
+//      In      tex_PackedMotion                from Pre
+//      Out     ImgDst_ReducedColorBlur
+
+// Cln
+//      In      ImgDst_ReducedColorBlur         from Rec
+//      Out     ImgDst_Output                   _OutputTexture
+
+[numthreads(64, 1, 1)]
+void CpfPreU(uint3 LocalThreadId : SV_GroupThreadID, uint3 WorkGroupId : SV_GroupID, uint3 dispatchThreadId : SV_DispatchThreadID){
+
+    AU2 gxy = ARmp8x8(LocalThreadId.x) + AU2(WorkGroupId.x << 4u, WorkGroupId.y << 4u);
+
+// This acts as the "Pass Before Pre" by populating the information
+    AF3 color = _InputTexture[COORD_TEXTURE2D_X(gxy)].xyz;
+    AF1 depth = _CameraDepthTexture[COORD_TEXTURE2D_X(gxy)].r;
+    AF2 motionVector = _CameraMotionVectorsTexture[COORD_TEXTURE2D_X(gxy)].xy;
+
+//  // Convert depth to circle of confusion. Use the CpfCocIni() function to setup the 2 constants.
+//  - The 'focus' is the focal plane
+//  - The constant 's' controls how fast to get to out-of-focus: 0:=never, >0:=faster, 1:=physical far field
+//  - The constant 'm' controls max size at infinite depth: 0:=off, 1:=maximum size
+//  A_STATIC void CpfCocIni(outAF4 k0,outAF3 k1,AF1 focus,AF1 s,AF1 m){
+    AF4 const0;
+    AF3 const1;
+    CpfCocIni(const0,const1,1.0f,0,0);
+    AF1 coc = CpfCoc(depth,const0,const1);
+
+// AU2 p, // Integer pixel position.
+//  AF1 colR, // Color.
+//  AF1 colG,
+//  AF1 colB,
+//  AF1 z, // Circle of confusion out of CpfCoc*().
+//  AF1 mX, // Motion vectors
+//  AF1 mY){
+    CpfPre(gxy,color.x,color.y,color.z,coc,motionVector.x,motionVector.y);
+}
+
+[numthreads(64, 1, 1)]
+void CpfRecU(uint3 LocalThreadId : SV_GroupThreadID, uint3 WorkGroupId : SV_GroupID, uint3 dispatchThreadId : SV_DispatchThreadID){
+
+    AU2 gxy = ARmp8x8(LocalThreadId.x) + AU2(WorkGroupId.x << 4u, WorkGroupId.y << 4u);
+
+    // Nothing special, straight into Cpf
+    CpfRec(WorkGroupId.xy,gxy);
+}
+
+[numthreads(64, 1, 1)]
+void CpfClnU(uint3 LocalThreadId : SV_GroupThreadID, uint3 WorkGroupId : SV_GroupID, uint3 dispatchThreadId : SV_DispatchThreadID){
+
+    AU2 gxy = ARmp8x8(LocalThreadId.x) + AU2(WorkGroupId.x << 4u, WorkGroupId.y << 4u);
+
+    // Use input texture as starting point
+    AF4 color = _InputTexture[COORD_TEXTURE2D_X(gxy)];
+
+    // Color out, pixel position in
+    CpfCln(color.x, color.y, color.z, gxy);
+
+    // Store final CPF output
+    _OutputTexture[COORD_TEXTURE2D_X(gxy)] = color;
+}

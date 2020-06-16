@@ -248,6 +248,8 @@ namespace UnityEngine.Rendering.HighDefinition
             public Shader temporalAntialiasingPS;
             [Reload("Runtime/PostProcessing/Shaders/ContrastAdaptiveSharpen.compute")]
             public ComputeShader contrastAdaptiveSharpenCS;
+            [Reload("Runtime/PostProcessing/Shaders/CinematicPostFilter.compute")]
+            public ComputeShader cinematicPostFilterCS;
 
             // Iterator to retrieve all compute shaders in reflection so we don't have to keep a list of
             // used compute shaders up to date (prefer editor-only usage)
