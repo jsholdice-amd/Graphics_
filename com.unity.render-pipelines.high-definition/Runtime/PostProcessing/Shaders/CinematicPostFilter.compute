@@ -5,13 +5,12 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/ShaderLibrary/ShaderVariables.hlsl"
 
+#define CPF_32BIT 1
 #define A_GPU 1
 #define A_HLSL 1
 
 //#define CPF_DFU 1 // Leave undefined for excluding diffusion
 //#define CPF_NOZ 1 // Leave undefined for excluding noise reduction
-
-#define CPF_32BIT 1
 
 #include "ffx_a.h"
 
@@ -24,7 +23,7 @@ AF2 OutputTextureDimensions;
 TEXTURE2D_X(_InputTexture);
 RW_TEXTURE2D_X(float4, _OutputTexture);
 
-// Textures that stay in gpu space
+// CPF Specific textures
 //      TexColorCoC[2]      RGBA8
 //      TexPackedMotion[2]  R16UI
 RW_TEXTURE2D_X(float4, TexColorCoC0);
@@ -45,10 +44,11 @@ A_STATIC AU4 CpfGet(AU1 i) {
 }
 
 //  // Cleaner input: {width,height} RGBA16F.
-//   AF4 CpfClnLd(AU2 p){return imageLoad(imgS_2D_RGBA16F[IMG_CLN],ASU2(p));} reduced color blur?
-//   void CpfClnSt(AU2 p,AF4 v){imageStore(imgS_2D_RGBA16F[IMG_CLN],ASU2(p),v);} final output?
+//   AF4 CpfClnLd(AU2 p){return imageLoad(imgS_2D_RGBA16F[IMG_CLN],ASU2(p));} Input/output textures
+//   void CpfClnSt(AU2 p,AF4 v){imageStore(imgS_2D_RGBA16F[IMG_CLN],ASU2(p),v);} 
 AF4 CpfClnLd(AU2 p)
 {
+    //return TexColorCoC0[COORD_TEXTURE2D_X(p)];
     return _InputTexture[COORD_TEXTURE2D_X(p)];
 }
 void CpfClnSt(AU2 p,AF4 v)
@@ -71,19 +71,18 @@ AU1 CpfMovLd(AU1 b, AU2 p) {
 
 void CpfMovSt(AU1 b, AU2 p, AU1 v) {
     //TexPackedMotion[AU3(b,p)] = AF4(v,0,0,0);
+    AF4 MovSt = AF4(v,0,0,0);
 
     if (b == 0) { // Not using texture array, just check which texture to use
-        TexPackedMotion0[COORD_TEXTURE2D_X(p)] = v;
+        TexPackedMotion0[COORD_TEXTURE2D_X(p)] = MovSt;
     } else {
-        TexPackedMotion1[COORD_TEXTURE2D_X(p)] = v;
+        TexPackedMotion1[COORD_TEXTURE2D_X(p)] = MovSt;
     }
 }
 
 AU4 CpfMov4R(AU1 b,AF2 p){
 
-    AU1 s = b == 0;
-
-    s = (b == 0) // Not using texture array, just check which texture to use
+    AU1 s = (b == 0) // Not using texture array, just check which texture to use
         ? LOAD_TEXTURE2D_X(TexPackedMotion0, p).r
         : LOAD_TEXTURE2D_X(TexPackedMotion1, p).r;
 
@@ -91,15 +90,15 @@ AU4 CpfMov4R(AU1 b,AF2 p){
 }
 
 //  // Color: {width,height} RGBA8
-//   AF4 CpfColLd(AU1 b,AU2 p){return imageLoad(imgS_2D_RGBA8[IMG_COL0+b],ASU2(p));} m_TexColorCoC?
+//   AF4 CpfColLd(AU1 b,AU2 p){return imageLoad(imgS_2D_RGBA8[IMG_COL0+b],ASU2(p));} m_TexColorCoC
 //   void CpfColSt(AU1 b,AU2 p,AF4 v){imageStore(imgS_2D_RGBA8[IMG_COL0+b],ASU2(p),v);}
 
 AF4 CpfColLd(AU1 b, AU2 p) {
     //return TexColorCoC[COORD_TEXTURE2D_X(p)];
 
     return (b==0) // Not using texture array, just check which texture to use
-        ? TexColorCoC0[COORD_TEXTURE2D_X(p)].x
-        : TexColorCoC1[COORD_TEXTURE2D_X(p)].x;
+        ? TexColorCoC0[COORD_TEXTURE2D_X(p)]
+        : TexColorCoC1[COORD_TEXTURE2D_X(p)];
 }
 
 void CpfColSt(AU1 b, AU2 p, AF4 v) {
@@ -124,17 +123,17 @@ AF4 CpfCol4A(AU1 b,AF2 p){
     // Essentially a gather red
     if (b == 0) { // Not using texture array, just check which texture to use
         float4 output;
-        output.x = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,1)).r;
-        output.y = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,1)).r;
-        output.z = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,0)).r;
-        output.w = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,0)).r;
+        output.x = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,1)).a;
+        output.y = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,1)).a;
+        output.z = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,0)).a;
+        output.w = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,0)).a;
         return output;
     } else {
         float4 output;
-        output.x = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,1)).r;
-        output.y = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,1)).r;
-        output.z = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,0)).r;
-        output.w = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,0)).r;
+        output.x = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,1)).a;
+        output.y = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,1)).a;
+        output.z = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,0)).a;
+        output.w = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,0)).a;
         return output;
     }
 }

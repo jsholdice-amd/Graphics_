@@ -894,6 +894,11 @@ namespace UnityEngine.Rendering.HighDefinition
         public static readonly int _InputTextureDimensions         = Shader.PropertyToID("InputTextureDimensions");
         public static readonly int _OutputTextureDimensions        = Shader.PropertyToID("OutputTextureDimensions");
 
+        public static readonly int _CPFCoC0                        = Shader.PropertyToID("TexColorCoC0");
+        public static readonly int _CPFCoC1                        = Shader.PropertyToID("TexColorCoC1");
+        public static readonly int _CPFPackedMotionVectors0        = Shader.PropertyToID("TexPackedMotion0");
+        public static readonly int _CPFPackedMotionVectors1        = Shader.PropertyToID("TexPackedMotion1");
+
         // BlitCubeTextureFace.shader
         public static readonly int _InputTex                       = Shader.PropertyToID("_InputTex");
         public static readonly int _LoD                            = Shader.PropertyToID("_LoD");
