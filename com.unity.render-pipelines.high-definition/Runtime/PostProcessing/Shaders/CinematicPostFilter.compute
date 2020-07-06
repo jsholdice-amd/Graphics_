@@ -9,15 +9,13 @@
 #define A_GPU 1
 #define A_HLSL 1
 
+//#define A_WAVE 1
 //#define CPF_DFU 1 // Leave undefined for excluding diffusion
 //#define CPF_NOZ 1 // Leave undefined for excluding noise reduction
 
 #include "ffx_a.h"
 
 RWStructuredBuffer<uint4> CpfParameters; //size 32
-
-AF2 InputTextureDimensions;
-AF2 OutputTextureDimensions;
 
 // Textures from Unity, In/Out
 TEXTURE2D_X(_InputTexture);
@@ -31,7 +29,7 @@ RW_TEXTURE2D_X(float4, TexColorCoC1);
 RW_TEXTURE2D_X(float4, TexPackedMotion0);
 RW_TEXTURE2D_X(float4, TexPackedMotion1);
 
-SAMPLER(sampler_LinearClamp);
+//SAMPLER(sampler_LinearClamp);
 
 // Control block: RGBA32UI[32].
 // The CPF Parameters get stored in here. Storage and retrieval is implementation specific.
@@ -48,12 +46,11 @@ A_STATIC AU4 CpfGet(AU1 i) {
 //   void CpfClnSt(AU2 p,AF4 v){imageStore(imgS_2D_RGBA16F[IMG_CLN],ASU2(p),v);} 
 AF4 CpfClnLd(AU2 p)
 {
-    //return TexColorCoC0[COORD_TEXTURE2D_X(p)];
-    return _InputTexture[COORD_TEXTURE2D_X(p)];
+    return TexColorCoC0[COORD_TEXTURE2D_X(p)];
 }
 void CpfClnSt(AU2 p,AF4 v)
 {
-    _OutputTexture[COORD_TEXTURE2D_X(p)] = v;
+    TexColorCoC1[COORD_TEXTURE2D_X(p)] = v;
 }
 
 //  // Motion vector: {width,height} R16UI.
@@ -71,20 +68,19 @@ AU1 CpfMovLd(AU1 b, AU2 p) {
 
 void CpfMovSt(AU1 b, AU2 p, AU1 v) {
     //TexPackedMotion[AU3(b,p)] = AF4(v,0,0,0);
-    AF4 MovSt = AF4(v,0,0,0);
 
     if (b == 0) { // Not using texture array, just check which texture to use
-        TexPackedMotion0[COORD_TEXTURE2D_X(p)] = MovSt;
+        TexPackedMotion0[COORD_TEXTURE2D_X(p)] = AF4(v,0,0,0);;
     } else {
-        TexPackedMotion1[COORD_TEXTURE2D_X(p)] = MovSt;
+        TexPackedMotion1[COORD_TEXTURE2D_X(p)] = AF4(v,0,0,0);;
     }
 }
 
 AU4 CpfMov4R(AU1 b,AF2 p){
 
     AU1 s = (b == 0) // Not using texture array, just check which texture to use
-        ? LOAD_TEXTURE2D_X(TexPackedMotion0, p).r
-        : LOAD_TEXTURE2D_X(TexPackedMotion1, p).r;
+        ? LOAD_TEXTURE2D_X(TexPackedMotion0, p + AU2(0,1)).r
+        : LOAD_TEXTURE2D_X(TexPackedMotion1, p + AU2(0,1)).r;
 
     return AU4(s, 0, 0, 0);
 }
@@ -95,6 +91,7 @@ AU4 CpfMov4R(AU1 b,AF2 p){
 
 AF4 CpfColLd(AU1 b, AU2 p) {
     //return TexColorCoC[COORD_TEXTURE2D_X(p)];
+    //return _InputTexture[COORD_TEXTURE2D_X(p)];
 
     return (b==0) // Not using texture array, just check which texture to use
         ? TexColorCoC0[COORD_TEXTURE2D_X(p)]
@@ -103,6 +100,7 @@ AF4 CpfColLd(AU1 b, AU2 p) {
 
 void CpfColSt(AU1 b, AU2 p, AF4 v) {
     //TexColorCoC[COORD_TEXTURE2D_X(p)] = v;
+    //_OutputTexture[COORD_TEXTURE2D_X(p)] = v;
 
     if (b == 0) { // Not using texture array, just check which texture to use
         TexColorCoC0[COORD_TEXTURE2D_X(p)] = v;
@@ -119,23 +117,23 @@ AF4 CpfColSm(AU1 b,AF2 p){
         return LOAD_TEXTURE2D_X(TexColorCoC1, p);
     }
 }
+
 AF4 CpfCol4A(AU1 b,AF2 p){
     // Essentially a gather red
+    float4 output;
     if (b == 0) { // Not using texture array, just check which texture to use
-        float4 output;
         output.x = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,1)).a;
         output.y = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,1)).a;
         output.z = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(1,0)).a;
         output.w = LOAD_TEXTURE2D_X(TexColorCoC0, p + AU2(0,0)).a;
-        return output;
     } else {
-        float4 output;
         output.x = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,1)).a;
         output.y = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,1)).a;
         output.z = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(1,0)).a;
         output.w = LOAD_TEXTURE2D_X(TexColorCoC1, p + AU2(0,0)).a;
-        return output;
     }
+
+    return AF4(output.x,output.y,output.z,output.w);
 }
 
 #include "ffx_cpf.h"
@@ -150,10 +148,8 @@ AF4 CpfCol4A(AU1 b,AF2 p){
 // Rec
 //      In      tex_ColorCoC                    from Pre
 //      In      tex_PackedMotion                from Pre
-//      Out     ImgDst_ReducedColorBlur
 
 // Cln
-//      In      ImgDst_ReducedColorBlur         from Rec
 //      Out     ImgDst_Output                   _OutputTexture
 
 [numthreads(64, 1, 1)]
@@ -199,13 +195,11 @@ void CpfRecU(uint3 LocalThreadId : SV_GroupThreadID, uint3 WorkGroupId : SV_Grou
 void CpfClnU(uint3 LocalThreadId : SV_GroupThreadID, uint3 WorkGroupId : SV_GroupID, uint3 dispatchThreadId : SV_DispatchThreadID){
 
     AU2 gxy = ARmp8x8(LocalThreadId.x) + AU2(WorkGroupId.x << 4u, WorkGroupId.y << 4u);
-
-    // Use input texture as starting point
-    AF4 color = _InputTexture[COORD_TEXTURE2D_X(gxy)];
+    AF4 color;
 
     // Color out, pixel position in
     CpfCln(color.x, color.y, color.z, gxy);
 
     // Store final CPF output
-    _OutputTexture[COORD_TEXTURE2D_X(gxy)] = color;
+    _OutputTexture[COORD_TEXTURE2D_X(gxy)] = AF4(color.x, color.y, color.z, 1);
 }

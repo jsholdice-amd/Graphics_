@@ -1029,8 +1029,8 @@ namespace UnityEngine.Rendering.HighDefinition
                 if ( m_CPFCircle0 == null || m_CPFCircle1 == null || m_CPFPackedMV0 == null || m_CPFPackedMV1 == null) {
                     m_CPFCircle0 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R8G8B8A8_UNorm);
                     m_CPFCircle1 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R8G8B8A8_UNorm);
-                    m_CPFPackedMV0 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R8G8_UInt);
-                    m_CPFPackedMV1 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R8G8_UInt);
+                    m_CPFPackedMV0 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R16_UInt);
+                    m_CPFPackedMV1 = m_Pool.Get(new Vector2(1,1), GraphicsFormat.R16_UInt);
                 }
 
                 // destination set earlier
@@ -1071,17 +1071,14 @@ namespace UnityEngine.Rendering.HighDefinition
                 cmd.SetComputeTextureParam(cs, cpfRec, HDShaderIDs._CPFPackedMotionVectors1, m_CPFPackedMV1.rt);
                 cmd.SetComputeTextureParam(cs, cpfCln, HDShaderIDs._CPFPackedMotionVectors1, m_CPFPackedMV1.rt);
 
-
                 // 3 passes of compute
                 // Run as 64x1x1, shader remaps to 8x8
-                cmd.DispatchCompute(cs, cpfPre, 64, 1, 1);
-                cmd.DispatchCompute(cs, cpfRec, 64, 1, 1);
-                cmd.DispatchCompute(cs, cpfCln, 64, 1, 1);
+                int dispatchX = (int)System.Math.Ceiling(source.rt.width / 8.0f);
+                int dispatchY = (int)System.Math.Ceiling(source.rt.height / 8.0f);
 
-                // m_Pool.Recycle(m_CPFCircle0);
-                // m_Pool.Recycle(m_CPFCircle1);
-                // m_Pool.Recycle(m_CPFPackedMV0);
-                // m_Pool.Recycle(m_CPFPackedMV1);
+                cmd.DispatchCompute(cs, cpfPre, dispatchX, dispatchY, camera.viewCount);
+                cmd.DispatchCompute(cs, cpfRec, dispatchX, dispatchY, camera.viewCount);
+                cmd.DispatchCompute(cs, cpfCln, dispatchX, dispatchY, camera.viewCount);
             }
         }
 
